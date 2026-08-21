@@ -1,0 +1,9 @@
+{
+  "id": "forgejo-integrator",
+  "name": "Forgejo Integrator",
+  "version": "1.0.0",
+  "minAppVersion": "0.15.0",
+  "description": "Stellt Forgejo PRs und Issues als Tabellen in Obsidian dar.",
+  "author": "RonDev",
+  "isDesktopOnly": false
+}
