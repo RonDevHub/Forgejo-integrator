@@ -5,13 +5,15 @@ interface ForgejoSettings {
   apiToken: string;
   tableLayout: 'vertical' | 'horizontal';
   refreshInterval: number;
+  themeStyle: 'dark' | 'light' | 'blue' | 'purple';
 }
 
 const DEFAULT_SETTINGS: ForgejoSettings = {
   serverUrl: 'https://my-forgejo-instance.com',
   apiToken: '',
   tableLayout: 'vertical',
-  refreshInterval: 60000
+  refreshInterval: 60000,
+  themeStyle: 'light'
 };
 
 interface ForgejoUser {
@@ -56,7 +58,6 @@ interface ForgejoRepo {
   pushed_at?: string;
   updated?: string;
   open_issues_count: number;
-  license?: string | { name?: string; spdx_id?: string; key?: string };
 }
 
 export default class ForgejoPlugin extends Plugin {
@@ -68,7 +69,6 @@ export default class ForgejoPlugin extends Plugin {
     this.injectStyles();
     this.addSettingTab(new ForgejoSettingTab(this.app, this));
 
-    // Processors
     this.registerMarkdownCodeBlockProcessor('FPR', (source, el) => this.renderForgejoSingleItem(source.trim(), el, 'pr'));
     this.registerMarkdownCodeBlockProcessor('FIS', (source, el) => this.renderForgejoSingleItem(source.trim(), el, 'issue'));
 
@@ -96,7 +96,6 @@ export default class ForgejoPlugin extends Plugin {
     if (styleEl) styleEl.remove();
   }
 
-  // Inject fallback styles directly to guarantee rendering
   injectStyles() {
     let styleEl = document.getElementById('forgejo-plugin-styles') as HTMLStyleElement;
     if (!styleEl) {
@@ -104,16 +103,57 @@ export default class ForgejoPlugin extends Plugin {
       styleEl.id = 'forgejo-plugin-styles';
       document.head.appendChild(styleEl);
     }
+
+    let headerBg = 'var(--background-secondary-alt, var(--background-secondary))';
+    let subHeaderBg = 'var(--background-secondary)';
+    let textHeader = 'var(--text-normal)';
+    let borderCol = 'var(--table-border, var(--border-color, #444))';
+    let zebraBg = 'var(--background-secondary-alt)';
+
+    switch (this.settings.themeStyle) {
+      case 'dark':
+        headerBg = '#1e1e2e !important';
+        subHeaderBg = '#2d2d3d !important';
+        textHeader = '#cdd6f4 !important';
+        borderCol = '#45475a !important';
+        zebraBg = '#181825 !important';
+        break;
+      case 'light':
+        headerBg = '#e6e9ef !important';
+        subHeaderBg = '#dce0e8 !important';
+        textHeader = '#4c4f69 !important';
+        borderCol = '#bcc0cc !important';
+        zebraBg = '#f2f4f8 !important';
+        break;
+      case 'blue':
+        headerBg = '#1e3a8a !important';
+        subHeaderBg = '#1d4ed8 !important';
+        textHeader = '#ffffff !important';
+        borderCol = '#3b82f6 !important';
+        zebraBg = '#eff6ff !important';
+        break;
+      case 'purple':
+        headerBg = '#581c87 !important';
+        subHeaderBg = '#7e22ce !important';
+        textHeader = '#ffffff !important';
+        borderCol = '#a855f7 !important';
+        zebraBg = '#faf5ff !important';
+        break;
+    }
+
     styleEl.textContent = `
-      .forgejo-container { margin: 12px 0; overflow-x: auto; }
-      .forgejo-table { width: 100%; border-collapse: collapse; margin: 8px 0; border: 1px solid var(--table-border, var(--border-color, #333)); background-color: var(--background-primary); font-size: 0.9em; }
-      .forgejo-table th, .forgejo-table td { border: 1px solid var(--table-border, var(--border-color, #333)); padding: 8px 12px; text-align: center; vertical-align: middle; }
-      .forgejo-main-header { background-color: var(--background-secondary-alt, var(--background-secondary)); font-size: 1.05em; font-weight: bold; padding: 10px; text-align: center !important; color: var(--text-normal); }
-      .forgejo-cols-row th { background-color: var(--background-secondary); font-weight: 600; color: var(--text-muted); }
-      .forgejo-table tbody tr:nth-child(even) { background-color: var(--background-secondary-alt); }
+      .forgejo-container { margin: 14px 0; overflow-x: auto; font-family: var(--font-interface); }
+      .forgejo-table { width: 100%; border-collapse: collapse; margin: 6px 0; border: 1px solid ${borderCol}; background-color: var(--background-primary); font-size: 0.88em; border-radius: 4px; overflow: hidden; }
+      .forgejo-table th, .forgejo-table td { border: 1px solid ${borderCol}; padding: 8px 12px; text-align: left; vertical-align: middle; }
+      .forgejo-main-header { background-color: ${headerBg}; font-size: 1.05em; font-weight: bold; padding: 10px; text-align: center !important; color: ${textHeader}; }
+      .forgejo-cols-row th { background-color: ${subHeaderBg}; font-weight: 600; color: ${textHeader}; text-align: left; }
+      .forgejo-table tbody tr:nth-child(even) { background-color: ${zebraBg}; }
       .forgejo-fallback-cell { text-align: center !important; font-style: italic; color: var(--text-muted); padding: 16px !important; }
-      .forgejo-user { display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
-      .forgejo-avatar { width: 22px; height: 22px; border-radius: 50%; object-fit: cover; }
+      .forgejo-user { display: inline-flex; align-items: center; gap: 8px; }
+      .forgejo-avatar { width: 20px; height: 20px; border-radius: 50%; object-fit: cover; }
+      .forgejo-badge { display: inline-block; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 0.8em; text-align: center; }
+      .forgejo-badge-open { background-color: #22c55e22; color: #22c55e; border: 1px solid #22c55e; }
+      .forgejo-badge-closed { background-color: #ef444422; color: #ef4444; border: 1px solid #ef4444; }
     `;
   }
 
@@ -123,11 +163,11 @@ export default class ForgejoPlugin extends Plugin {
 
   async saveSettings() {
     await this.saveData(this.settings);
+    this.injectStyles();
     this.startAutoRefresh();
     this.refreshViews();
   }
 
-  // Forces active markdown views to re-render codeblocks immediately
   refreshViews() {
     this.app.workspace.iterateAllLeaves(leaf => {
       if (leaf.view && leaf.view.getViewType() === 'markdown') {
@@ -204,7 +244,6 @@ export default class ForgejoPlugin extends Plugin {
     return null;
   }
 
-  // Detect license name from repository license files
   async detectLicense(owner: string, repo: string): Promise<string> {
     const files = ["LICENSE", "LICENSE.md", "LICENSE.txt", "COPYING", "COPYING.md", "COPYING.txt"];
     for (const file of files) {
@@ -233,6 +272,12 @@ export default class ForgejoPlugin extends Plugin {
     if (!user) return 'N/A';
     const avatar = user.avatar_url ? `<img src="${user.avatar_url}" class="forgejo-avatar" alt="${user.login}" />` : '';
     return `<div class="forgejo-user">${avatar}<span>${user.login}</span></div>`;
+  }
+
+  formatStatus(status: string): string {
+    const state = (status || 'UNKNOWN').toUpperCase();
+    const cls = state === 'OPEN' ? 'forgejo-badge-open' : 'forgejo-badge-closed';
+    return `<span class="forgejo-badge ${cls}">${state}</span>`;
   }
 
   formatDate(dateStr?: string | null): string {
@@ -272,10 +317,10 @@ export default class ForgejoPlugin extends Plugin {
         container.empty();
         this.buildSingleTable(container, `Pull Request #${data.number}`, [
           ['Title', data.title || 'N/A'],
-          ['Status', (data.state || 'UNKNOWN').toUpperCase()],
+          ['Status', this.formatStatus(data.state)],
           ['Author', this.formatUser(data.user)],
           ['Created', this.formatDate(data.created_at)],
-          ['Link', `<a href="${data.html_url}" target="_blank">Open in Forgejo</a>`]
+          ['Link', `<a href="${data.html_url}" target="_blank">Open</a>`]
         ]);
       } else {
         const data = await this.fetchApi<ForgejoIssue>(endpoint);
@@ -283,11 +328,11 @@ export default class ForgejoPlugin extends Plugin {
         const labels = data.labels && data.labels.length > 0 ? data.labels.map(l => l.name).join(', ') : 'None';
         this.buildSingleTable(container, `Issue #${data.number}`, [
           ['Title', data.title || 'N/A'],
-          ['Status', (data.state || 'UNKNOWN').toUpperCase()],
+          ['Status', this.formatStatus(data.state)],
           ['Author', this.formatUser(data.user)],
           ['Labels', labels],
           ['Created', this.formatDate(data.created_at)],
-          ['Link', `<a href="${data.html_url}" target="_blank">Open in Forgejo</a>`]
+          ['Link', `<a href="${data.html_url}" target="_blank">Open</a>`]
         ]);
       }
     } catch (err) {
@@ -331,7 +376,7 @@ export default class ForgejoPlugin extends Plugin {
       const rows = items.map(item => [
         `#${item.number}`,
         item.title || 'N/A',
-        (item.state || 'UNKNOWN').toUpperCase(),
+        this.formatStatus(item.state),
         this.formatUser(item.user),
         this.formatDate(item.created_at),
         `<a href="${item.html_url}" target="_blank">Open</a>`
@@ -463,7 +508,7 @@ export default class ForgejoPlugin extends Plugin {
       const tr = tbody.createEl('tr');
       for (const cell of rowContent) {
         const td = tr.createEl('td');
-        if (cell.includes('<a ') || cell.includes('<div ') || cell.includes('<img ')) {
+        if (cell.includes('<a ') || cell.includes('<div ') || cell.includes('<span ') || cell.includes('<img ')) {
           td.innerHTML = cell;
         } else {
           td.textContent = cell;
@@ -486,7 +531,7 @@ export default class ForgejoPlugin extends Plugin {
         const tr = tbody.createEl('tr');
         tr.createEl('td', { text: key, attr: { style: 'font-weight: bold; width: 30%;' } });
         const tdVal = tr.createEl('td');
-        if (val.includes('<a ') || val.includes('<div ') || val.includes('<img ')) tdVal.innerHTML = val;
+        if (val.includes('<a ') || val.includes('<div ') || val.includes('<span ') || val.includes('<img ')) tdVal.innerHTML = val;
         else tdVal.textContent = val;
       }
     } else {
@@ -503,7 +548,7 @@ export default class ForgejoPlugin extends Plugin {
       const tr = tbody.createEl('tr');
       for (const [, val] of rows) {
         const tdVal = tr.createEl('td');
-        if (val.includes('<a ') || val.includes('<div ') || val.includes('<img ')) tdVal.innerHTML = val;
+        if (val.includes('<a ') || val.includes('<div ') || val.includes('<span ') || val.includes('<img ')) tdVal.innerHTML = val;
         else tdVal.textContent = val;
       }
     }
@@ -537,9 +582,9 @@ class ForgejoSettingTab extends PluginSettingTab {
 
     new Setting(containerEl)
       .setName('Forgejo Server URL')
-      .setDesc('Base URL of your Forgejo instance (e.g. [https://commitcloud.net](https://commitcloud.net))')
+      .setDesc('Base URL of your Forgejo instance (e.g. https://my-forgejo-instance.com)')
       .addText(text => text
-        .setPlaceholder('[https://commitcloud.net](https://commitcloud.net)')
+        .setPlaceholder('https://my-forgejo-instance.com')
         .setValue(this.plugin.settings.serverUrl)
         .onChange(async (value) => {
           this.plugin.settings.serverUrl = value;
@@ -569,6 +614,20 @@ class ForgejoSettingTab extends PluginSettingTab {
         .setValue(this.plugin.settings.tableLayout)
         .onChange(async (value) => {
           this.plugin.settings.tableLayout = value as 'vertical' | 'horizontal';
+          await this.plugin.saveSettings();
+        }));
+
+    new Setting(containerEl)
+      .setName('Table Theme')
+      .setDesc('Select color theme for rendered tables')
+      .addDropdown(dropdown => dropdown
+        .addOption('dark', 'Dark Contrast')
+        .addOption('light', 'Light Clean')
+        .addOption('blue', 'Modern Blue')
+        .addOption('purple', 'Purple Accent')
+        .setValue(this.plugin.settings.themeStyle)
+        .onChange(async (value) => {
+          this.plugin.settings.themeStyle = value as any;
           await this.plugin.saveSettings();
         }));
 
