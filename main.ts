@@ -108,7 +108,9 @@ export default class ForgejoPlugin extends Plugin {
     let subHeaderBg = 'var(--background-secondary)';
     let textHeader = 'var(--text-normal)';
     let borderCol = 'var(--table-border, var(--border-color, #444))';
+    let rowBgPrimary = 'var(--background-primary)';
     let zebraBg = 'var(--background-secondary-alt)';
+    let rowTextColor = 'var(--text-normal)';
 
     switch (this.settings.themeStyle) {
       case 'dark':
@@ -116,37 +118,47 @@ export default class ForgejoPlugin extends Plugin {
         subHeaderBg = '#2d2d3d !important';
         textHeader = '#cdd6f4 !important';
         borderCol = '#45475a !important';
+        rowBgPrimary = '#1e1e2e !important';
         zebraBg = '#181825 !important';
+        rowTextColor = '#cdd6f4 !important';
         break;
       case 'light':
         headerBg = '#e6e9ef !important';
         subHeaderBg = '#dce0e8 !important';
         textHeader = '#4c4f69 !important';
         borderCol = '#bcc0cc !important';
+        rowBgPrimary = '#ffffff !important';
         zebraBg = '#f2f4f8 !important';
+        rowTextColor = '#4c4f69 !important';
         break;
       case 'blue':
         headerBg = '#1e3a8a !important';
         subHeaderBg = '#1d4ed8 !important';
         textHeader = '#ffffff !important';
         borderCol = '#3b82f6 !important';
+        rowBgPrimary = '#ffffff !important';
         zebraBg = '#eff6ff !important';
+        rowTextColor = '#1e293b !important';
         break;
       case 'purple':
         headerBg = '#581c87 !important';
         subHeaderBg = '#7e22ce !important';
         textHeader = '#ffffff !important';
         borderCol = '#a855f7 !important';
+        rowBgPrimary = '#ffffff !important';
         zebraBg = '#faf5ff !important';
+        rowTextColor = '#2e1065 !important';
         break;
     }
 
     styleEl.textContent = `
       .forgejo-container { margin: 14px 0; overflow-x: auto; font-family: var(--font-interface); }
-      .forgejo-table { width: 100%; border-collapse: collapse; margin: 6px 0; border: 1px solid ${borderCol}; background-color: var(--background-primary); font-size: 0.88em; border-radius: 4px; overflow: hidden; }
-      .forgejo-table th, .forgejo-table td { border: 1px solid ${borderCol}; padding: 8px 12px; text-align: left; vertical-align: middle; }
+      .forgejo-table { width: 100%; border-collapse: collapse; margin: 6px 0; border: 1px solid ${borderCol}; background-color: ${rowBgPrimary}; font-size: 0.88em; border-radius: 4px; overflow: hidden; }
+      .forgejo-table th { border: 1px solid ${borderCol}; padding: 8px 12px; text-align: left; vertical-align: middle; color: ${textHeader}; }
+      .forgejo-table td { border: 1px solid ${borderCol}; padding: 8px 12px; text-align: left; vertical-align: middle; color: ${rowTextColor}; }
       .forgejo-main-header { background-color: ${headerBg}; font-size: 1.05em; font-weight: bold; padding: 10px; text-align: center !important; color: ${textHeader}; }
       .forgejo-cols-row th { background-color: ${subHeaderBg}; font-weight: 600; color: ${textHeader}; text-align: left; }
+      .forgejo-table tbody tr { background-color: ${rowBgPrimary}; }
       .forgejo-table tbody tr:nth-child(even) { background-color: ${zebraBg}; }
       .forgejo-fallback-cell { text-align: center !important; font-style: italic; color: var(--text-muted); padding: 16px !important; }
       .forgejo-user { display: inline-flex; align-items: center; gap: 8px; }
@@ -169,11 +181,17 @@ export default class ForgejoPlugin extends Plugin {
   }
 
   refreshViews() {
+    this.app.workspace.trigger('editor-change');
     this.app.workspace.iterateAllLeaves(leaf => {
       if (leaf.view && leaf.view.getViewType() === 'markdown') {
         const view = leaf.view as any;
-        if (view.previewMode && view.previewMode.rerender) {
-          view.previewMode.rerender(true);
+        if (view.previewMode) {
+          if (view.previewMode.rerender) {
+            view.previewMode.rerender(true);
+          }
+          if (view.editor && view.editor.transaction) {
+            view.previewMode.postProcess();
+          }
         }
       }
     });
@@ -293,6 +311,7 @@ export default class ForgejoPlugin extends Plugin {
 
   // Single Items (FIS / FPR)
   async renderForgejoSingleItem(rawUrl: string, el: HTMLElement, type: 'pr' | 'issue') {
+    el.empty();
     const container = el.createDiv({ cls: 'forgejo-container' });
     if (!this.settings.apiToken || !this.settings.serverUrl) {
       container.createEl('p', { text: '⚠️ Please configure Server URL and API Token in settings.', cls: 'mod-warning' });
@@ -343,6 +362,7 @@ export default class ForgejoPlugin extends Plugin {
 
   // Lists (FIS-*, FPR-*, FRI-*)
   async renderForgejoList(rawUrl: string, el: HTMLElement, type: 'pr' | 'issue', state: 'all' | 'open' | 'closed') {
+    el.empty();
     const container = el.createDiv({ cls: 'forgejo-container' });
     if (!this.settings.apiToken || !this.settings.serverUrl) {
       container.createEl('p', { text: '⚠️ Please configure Server URL and API Token in settings.', cls: 'mod-warning' });
@@ -391,6 +411,7 @@ export default class ForgejoPlugin extends Plugin {
 
   // Single Repo Details (FR)
   async renderRepoDetails(rawUrl: string, el: HTMLElement) {
+    el.empty();
     const container = el.createDiv({ cls: 'forgejo-container' });
     const parsed = this.parseUrl(rawUrl);
     if (!parsed) {
@@ -437,6 +458,7 @@ export default class ForgejoPlugin extends Plugin {
 
   // All User Repositories (FR-ALL)
   async renderAllUserRepos(el: HTMLElement) {
+    el.empty();
     const container = el.createDiv({ cls: 'forgejo-container' });
     container.createEl('span', { text: 'Loading All Repositories...' });
 
@@ -555,7 +577,7 @@ export default class ForgejoPlugin extends Plugin {
   }
 }
 
-// English Settings Tab
+// Settings Tab
 class ForgejoSettingTab extends PluginSettingTab {
   plugin: ForgejoPlugin;
 
