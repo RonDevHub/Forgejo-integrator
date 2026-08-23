@@ -19,14 +19,17 @@ Simply paste the Forgejo Issue or PR URL inside a Markdown codeblock:
 ### Issue Codeblock (`FIS`)
 
 ```FIS
-[https://commitcloud.net/RonDevHub/devwebsite/issues/4](https://commitcloud.net/RonDevHub/devwebsite/issues/4)
+https://commitcloud.net/RonDevHub/devwebsite/issues/4
 ```
 
 ### Pull Request Codeblock (`FPR`)
 
-```FPR
-[https://commitcloud.net/RonDevHub/devwebsite/pulls/1](https://commitcloud.net/RonDevHub/devwebsite/pulls/1)
+<code>
 ```
+FPR https://my-forgejo-instance.com/RonDevHub/Forgejo-integrator/pulls/1
+```
+</code>
+
 
 ## Settings
 
