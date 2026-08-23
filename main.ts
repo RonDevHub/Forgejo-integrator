@@ -6,6 +6,8 @@ interface ForgejoSettings {
   tableLayout: 'vertical' | 'horizontal';
   refreshInterval: number;
   themeStyle: 'dark' | 'light' | 'blue' | 'purple';
+  useSvgIcons: boolean;
+  enableCache: boolean;
 }
 
 const DEFAULT_SETTINGS: ForgejoSettings = {
@@ -13,8 +15,17 @@ const DEFAULT_SETTINGS: ForgejoSettings = {
   apiToken: '',
   tableLayout: 'vertical',
   refreshInterval: 60000,
-  themeStyle: 'light'
+  themeStyle: 'light',
+  useSvgIcons: false,
+  enableCache: false
 };
+
+interface CacheData {
+  [endpoint: string]: {
+    timestamp: number;
+    data: any;
+  };
+}
 
 interface ForgejoUser {
   login: string;
@@ -29,6 +40,7 @@ interface ForgejoPR {
   user: ForgejoUser;
   html_url: string;
   created_at: string;
+  repository?: { full_name: string };
 }
 
 interface ForgejoIssue {
@@ -60,12 +72,20 @@ interface ForgejoRepo {
   open_issues_count: number;
 }
 
+// SVGs auf einheitliche viewBox (0 0 512 512) angepasst
+const SVG_LOCK = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 560" class="forgejo-icon"><path fill="currentColor" d="M258.8 380c-3.9 3.1-6.7 7.6-6.7 12.6l0 27.4c0 15.5-12.5 28-28 28s-28-12.5-28-28l0-27.4c0-5-2.8-9.5-6.7-12.6-13-10.3-21.3-26.1-21.3-44 0-30.9 25.1-56 56-56s56 25.1 56 56c0 17.8-8.3 33.7-21.3 44zM84.2 140l0 40.9c-16.9 5.9-31.9 14.4-44.3 26.8-17.3 17.3-27 39.5-32.5 65.1-9.8 45.4-9.8 137 0 182.4 5.5 25.6 15.2 47.8 32.5 65.1s39.5 27 65.1 32.5c25.3 5.5 55.7 7.2 91.2 7.2l56 0c35.6 0 65.9-1.7 91.2-7.2 25.6-5.5 47.8-15.2 65.1-32.5s27-39.5 32.5-65.1c9.8-45.4 9.8-137 0-182.4-5.5-25.6-15.2-47.8-32.5-65.1-12.4-12.4-27.4-20.9-44.3-26.8l0-40.9c0-40.3-12.9-75.9-38.5-101.5S264.4 0 224.2 0 148.3 12.9 122.7 38.5 84.2 99.7 84.2 140zm78.1-61.9C175.6 64.8 196 56 224.2 56s48.6 8.8 61.9 22.1 22.1 33.7 22.1 61.9l0 30.1c-17-1.5-35.6-2.1-56-2.1l-56 0c-20.4 0-39 .6-56 2.1l0-30.1c0-28.2 8.8-48.6 22.1-61.9zM62.1 284.6c4.1-19 10.1-30.1 17.4-37.3s18.3-13.3 37.3-17.4c19.3-4.2 45-5.9 79.4-5.9l56 0c34.4 0 60.1 1.8 79.4 5.9 19 4.1 30.1 10.1 37.3 17.4s13.3 18.3 17.4 37.3c4.2 19.3 5.9 45 5.9 79.4s-1.8 60.1-5.9 79.4c-4.1 19-10.1 30.1-17.4 37.3s-18.3 13.3-37.3 17.4c-19.3 4.2-45 5.9-79.4 5.9l-56 0c-34.4 0-60.1-1.8-79.4-5.9-19-4.1-30.1-10.1-37.3-17.4s-13.3-18.3-17.4-37.3c-4.2-19.3-5.9-45-5.9-79.4s1.8-60.1 5.9-79.4z"/></svg>`;
+const SVG_GLOBE = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 560" class="forgejo-icon"><path fill="currentColor" d="M69.6 192.2c21.5-63.1 68.3-108.2 136.1-126.8-37.3 60.9-51.5 136.6-52.2 209.2-25.5-2.4-46.3-5.3-62.9-8.2-17.6-3.1-35.5-6.2-52.3-12.5-14.3-5.6-30.5 1.3-36.2 15.7-5.7 14.4 1.2 30.7 15.6 36.4 20.3 8 42 11.9 63.4 15.6 19.7 3.4 44.5 6.8 74.8 9.5 5.3 57.9 20.4 115.4 49.9 163.6-64.8-17.7-110.4-59.7-133-118.2-5.6-14.4-21.8-21.6-36.2-16s-21.6 21.8-16 36.2C60.5 500.2 155.6 560 280 560s219.6-59.8 259.6-163.5c5.6-14.4-1.6-30.6-16-36.2s-30.6 1.6-36.2 16c-22.6 58.6-68.1 100.5-133 118.2 29.5-48.2 44.6-105.7 49.9-163.6 30.3-2.6 55-6 74.8-9.5 21.4-3.7 43.1-7.5 63.4-15.6 14.4-5.7 21.3-22 15.6-36.4-5.7-14.3-21.9-21.3-36.2-15.7-16.8 6.3-34.7 9.4-52.3 12.5-16.6 2.9-37.4 5.8-62.9 8.2-.7-72.7-14.8-148.3-52.2-209.2 67.8 18.5 114.6 63.6 136.1 126.8 5 14.6 20.9 22.5 35.5 17.5s22.5-20.9 17.5-35.5C506.1 64.2 408.8 0 280 0S53.9 64.2 16.5 174.1c-5 14.6 2.9 30.5 17.5 35.5s30.5-2.9 35.5-17.5zM212.4 334.6c20.7 .9 43.2 1.4 67.6 1.4s47-.5 67.6-1.4c-7.3 65.5-28.7 124.4-67.6 165.1-38.9-40.7-60.4-99.6-67.6-165.1zM280 60.3c49.2 51.5 70.3 131.9 70.6 218.2-21.3 1-44.7 1.5-70.6 1.5s-49.3-.6-70.6-1.5c.2-86.3 21.3-166.7 70.6-218.2z"/></svg>`;
+
 export default class ForgejoPlugin extends Plugin {
   settings: ForgejoSettings;
   intervalId: number | null = null;
+  cacheMemory: CacheData = {};
+  cachePath: string;
 
   async onload() {
     await this.loadSettings();
+    this.cachePath = `${this.manifest.dir}/cache.json`;
+    await this.loadCache();
     this.injectStyles();
     this.addSettingTab(new ForgejoSettingTab(this.app, this));
 
@@ -79,6 +99,10 @@ export default class ForgejoPlugin extends Plugin {
     this.registerMarkdownCodeBlockProcessor('FPR-ALL', (source, el) => this.renderForgejoList(source.trim(), el, 'pr', 'all'));
     this.registerMarkdownCodeBlockProcessor('FPR-OPEN', (source, el) => this.renderForgejoList(source.trim(), el, 'pr', 'open'));
     this.registerMarkdownCodeBlockProcessor('FPR-CLOSED', (source, el) => this.renderForgejoList(source.trim(), el, 'pr', 'closed'));
+
+    this.registerMarkdownCodeBlockProcessor('FPR-LIST', (source, el) => this.renderUserPRList(source.trim(), el, 'all'));
+    this.registerMarkdownCodeBlockProcessor('FPR-LIST-OPEN', (source, el) => this.renderUserPRList(source.trim(), el, 'open'));
+    this.registerMarkdownCodeBlockProcessor('FPR-LIST-CLOSED', (source, el) => this.renderUserPRList(source.trim(), el, 'closed'));
 
     this.registerMarkdownCodeBlockProcessor('FRI', (source, el) => this.renderForgejoList(source.trim(), el, 'issue', 'all'));
     this.registerMarkdownCodeBlockProcessor('FRI-OPEN', (source, el) => this.renderForgejoList(source.trim(), el, 'issue', 'open'));
@@ -94,6 +118,25 @@ export default class ForgejoPlugin extends Plugin {
     this.stopAutoRefresh();
     const styleEl = document.getElementById('forgejo-plugin-styles');
     if (styleEl) styleEl.remove();
+  }
+
+  async loadCache() {
+    try {
+      if (await this.app.vault.adapter.exists(this.cachePath)) {
+        const content = await this.app.vault.adapter.read(this.cachePath);
+        this.cacheMemory = JSON.parse(content);
+      }
+    } catch {
+      this.cacheMemory = {};
+    }
+  }
+
+  async saveCache() {
+    try {
+      await this.app.vault.adapter.write(this.cachePath, JSON.stringify(this.cacheMemory, null, 2));
+    } catch (err) {
+      console.error('Failed to save Forgejo cache', err);
+    }
   }
 
   injectStyles() {
@@ -114,58 +157,60 @@ export default class ForgejoPlugin extends Plugin {
 
     switch (this.settings.themeStyle) {
       case 'dark':
-        headerBg = '#1e1e2e !important';
-        subHeaderBg = '#2d2d3d !important';
-        textHeader = '#cdd6f4 !important';
-        borderCol = '#45475a !important';
-        rowBgPrimary = '#1e1e2e !important';
-        zebraBg = '#181825 !important';
-        rowTextColor = '#cdd6f4 !important';
+        headerBg = '#1e1e2e';
+        subHeaderBg = '#2d2d3d';
+        textHeader = '#cdd6f4';
+        borderCol = '#45475a';
+        rowBgPrimary = '#1e1e2e';
+        zebraBg = '#181825';
+        rowTextColor = '#cdd6f4';
         break;
       case 'light':
-        headerBg = '#e6e9ef !important';
-        subHeaderBg = '#dce0e8 !important';
-        textHeader = '#4c4f69 !important';
-        borderCol = '#bcc0cc !important';
-        rowBgPrimary = '#ffffff !important';
-        zebraBg = '#f2f4f8 !important';
-        rowTextColor = '#4c4f69 !important';
+        headerBg = '#e6e9ef';
+        subHeaderBg = '#dce0e8';
+        textHeader = '#4c4f69';
+        borderCol = '#bcc0cc';
+        rowBgPrimary = '#ffffff';
+        zebraBg = '#f2f4f8';
+        rowTextColor = '#4c4f69';
         break;
       case 'blue':
-        headerBg = '#1e3a8a !important';
-        subHeaderBg = '#1d4ed8 !important';
-        textHeader = '#ffffff !important';
-        borderCol = '#3b82f6 !important';
-        rowBgPrimary = '#ffffff !important';
-        zebraBg = '#eff6ff !important';
-        rowTextColor = '#1e293b !important';
+        headerBg = '#1e3a8a';
+        subHeaderBg = '#1d4ed8';
+        textHeader = '#ffffff';
+        borderCol = '#3b82f6';
+        rowBgPrimary = '#ffffff';
+        zebraBg = '#eff6ff';
+        rowTextColor = '#1e293b';
         break;
       case 'purple':
-        headerBg = '#581c87 !important';
-        subHeaderBg = '#7e22ce !important';
-        textHeader = '#ffffff !important';
-        borderCol = '#a855f7 !important';
-        rowBgPrimary = '#ffffff !important';
-        zebraBg = '#faf5ff !important';
-        rowTextColor = '#2e1065 !important';
+        headerBg = '#581c87';
+        subHeaderBg = '#7e22ce';
+        textHeader = '#ffffff';
+        borderCol = '#a855f7';
+        rowBgPrimary = '#ffffff';
+        zebraBg = '#faf5ff';
+        rowTextColor = '#2e1065';
         break;
     }
 
     styleEl.textContent = `
       .forgejo-container { margin: 14px 0; overflow-x: auto; font-family: var(--font-interface); }
-      .forgejo-table { width: 100%; border-collapse: collapse; margin: 6px 0; border: 1px solid ${borderCol}; background-color: ${rowBgPrimary}; font-size: 0.88em; border-radius: 4px; overflow: hidden; }
-      .forgejo-table th { border: 1px solid ${borderCol}; padding: 8px 12px; text-align: left; vertical-align: middle; color: ${textHeader}; }
-      .forgejo-table td { border: 1px solid ${borderCol}; padding: 8px 12px; text-align: left; vertical-align: middle; color: ${rowTextColor}; }
-      .forgejo-main-header { background-color: ${headerBg}; font-size: 1.05em; font-weight: bold; padding: 10px; text-align: center !important; color: ${textHeader}; }
-      .forgejo-cols-row th { background-color: ${subHeaderBg}; font-weight: 600; color: ${textHeader}; text-align: left; }
-      .forgejo-table tbody tr { background-color: ${rowBgPrimary}; }
-      .forgejo-table tbody tr:nth-child(even) { background-color: ${zebraBg}; }
-      .forgejo-fallback-cell { text-align: center !important; font-style: italic; color: var(--text-muted); padding: 16px !important; }
+      .forgejo-table { width: 100%; border-collapse: collapse; margin: 6px 0; border: 1px solid ${borderCol} !important; background-color: ${rowBgPrimary} !important; font-size: 0.88em; border-radius: 4px; overflow: hidden; }
+      .forgejo-table th { border: 1px solid ${borderCol} !important; padding: 8px 12px; text-align: left; vertical-align: middle; color: ${textHeader} !important; }
+      .forgejo-table td { border: 1px solid ${borderCol} !important; padding: 8px 12px; text-align: left; vertical-align: middle; color: ${rowTextColor} !important; }
+      .forgejo-main-header { background-color: ${headerBg} !important; font-size: 1.05em; font-weight: bold; padding: 10px; text-align: center !important; color: ${textHeader} !important; }
+      .forgejo-cols-row th { background-color: ${subHeaderBg} !important; font-weight: 600; color: ${textHeader} !important; text-align: left; }
+      .forgejo-table tbody tr { background-color: ${rowBgPrimary} !important; }
+      .forgejo-table tbody tr:nth-child(even) { background-color: ${zebraBg} !important; }
+      .forgejo-fallback-cell { text-align: center !important; font-style: italic; color: var(--text-muted) !important; padding: 16px !important; }
       .forgejo-user { display: inline-flex; align-items: center; gap: 8px; }
       .forgejo-avatar { width: 20px; height: 20px; border-radius: 50%; object-fit: cover; }
       .forgejo-badge { display: inline-block; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 0.8em; text-align: center; }
-      .forgejo-badge-open { background-color: #22c55e22; color: #22c55e; border: 1px solid #22c55e; }
-      .forgejo-badge-closed { background-color: #ef444422; color: #ef4444; border: 1px solid #ef4444; }
+      .forgejo-badge-open { background-color: #22c55e22; color: #22c55e !important; border: 1px solid #22c55e; }
+      .forgejo-badge-closed { background-color: #ef444422; color: #ef4444 !important; border: 1px solid #ef4444; }
+      .forgejo-icon { width: 14px; height: 14px; fill: currentColor; display: inline-block; flex-shrink: 0; }
+      .forgejo-inline-icon { display: inline-flex; align-items: center; gap: 6px; }
     `;
   }
 
@@ -181,17 +226,15 @@ export default class ForgejoPlugin extends Plugin {
   }
 
   refreshViews() {
-    this.app.workspace.trigger('editor-change');
     this.app.workspace.iterateAllLeaves(leaf => {
       if (leaf.view && leaf.view.getViewType() === 'markdown') {
         const view = leaf.view as any;
         if (view.previewMode) {
-          if (view.previewMode.rerender) {
-            view.previewMode.rerender(true);
-          }
-          if (view.editor && view.editor.transaction) {
-            view.previewMode.postProcess();
-          }
+          view.previewMode.rerender(true);
+        }
+        if (view.editor) {
+          // Erzwingt Re-Rendern im Live-Preview Modus
+          view.editor.setValue(view.editor.getValue());
         }
       }
     });
@@ -231,6 +274,15 @@ export default class ForgejoPlugin extends Plugin {
   }
 
   async fetchApi<T>(endpoint: string): Promise<T> {
+    const now = Date.now();
+
+    if (this.settings.enableCache && this.cacheMemory[endpoint]) {
+      const cached = this.cacheMemory[endpoint];
+      if (now - cached.timestamp < this.settings.refreshInterval) {
+        return cached.data as T;
+      }
+    }
+
     const baseUrl = this.settings.serverUrl.replace(/\/$/, '');
     const options: RequestUrlParam = {
       url: `${baseUrl}/api/v1/${endpoint}`,
@@ -243,7 +295,15 @@ export default class ForgejoPlugin extends Plugin {
 
     const res = await requestUrl(options);
     if (res.status >= 400) throw new Error(`Forgejo API error HTTP ${res.status}`);
-    return res.json as T;
+    
+    const data = res.json as T;
+
+    if (this.settings.enableCache) {
+      this.cacheMemory[endpoint] = { timestamp: now, data };
+      await this.saveCache();
+    }
+
+    return data;
   }
 
   async fetchRawFile(owner: string, repo: string, filepath: string): Promise<string | null> {
@@ -307,6 +367,15 @@ export default class ForgejoPlugin extends Plugin {
   extractPushDate(repo: ForgejoRepo): string {
     const rawDate = repo.pushed_at || repo.updated_at || repo.updated;
     return this.formatDate(rawDate);
+  }
+
+  renderVisibility(isPrivate: boolean): string {
+    const icon = this.settings.useSvgIcons 
+      ? (isPrivate ? SVG_LOCK : SVG_GLOBE)
+      : (isPrivate ? '🔒' : '🌐');
+    
+    const text = isPrivate ? 'Private' : 'Public';
+    return `<span class="forgejo-inline-icon">${icon} <span>${text}</span></span>`;
   }
 
   // Single Items (FIS / FPR)
@@ -409,6 +478,54 @@ export default class ForgejoPlugin extends Plugin {
     }
   }
 
+  // User PR Lists (FPR-LIST, FPR-LIST-OPEN, FPR-LIST-CLOSED)
+  async renderUserPRList(username: string, el: HTMLElement, state: 'all' | 'open' | 'closed') {
+    el.empty();
+    const container = el.createDiv({ cls: 'forgejo-container' });
+    if (!this.settings.apiToken || !this.settings.serverUrl) {
+      container.createEl('p', { text: '⚠️ Please configure Server URL and API Token in settings.', cls: 'mod-warning' });
+      return;
+    }
+
+    const cleanUser = username.replace(/[\[\]'"]/g, '').trim();
+    if (!cleanUser) {
+      container.createEl('p', { text: '❌ Invalid Username specified.', cls: 'mod-warning' });
+      return;
+    }
+
+    container.createEl('span', { text: `Loading PRs for user ${cleanUser}...` });
+
+    try {
+      const endpoint = `repos/issues/search?state=${state}&type=pulls&created_by=${cleanUser}`;
+      const response = await this.fetchApi<any>(endpoint);
+      const items: ForgejoPR[] = Array.isArray(response) ? response : (response.data || []);
+      
+      container.empty();
+
+      const title = `Pull Requests (${state.toUpperCase()}) - User: ${cleanUser}`;
+      const headers = ['Repo', 'ID', 'Title', 'Status', 'Created', 'Link'];
+
+      if (!items || items.length === 0) {
+        this.buildStructuredTable(container, title, headers, [], `No pull requests found for user "${cleanUser}" with state "${state}".`);
+        return;
+      }
+
+      const rows = items.map(item => [
+        item.repository ? item.repository.full_name : 'N/A',
+        `#${item.number}`,
+        item.title || 'N/A',
+        this.formatStatus(item.state),
+        this.formatDate(item.created_at),
+        `<a href="${item.html_url}" target="_blank">Open</a>`
+      ]);
+
+      this.buildStructuredTable(container, title, headers, rows);
+    } catch (err) {
+      container.empty();
+      container.createEl('p', { text: `Fetch error: ${err instanceof Error ? err.message : String(err)}`, cls: 'mod-warning' });
+    }
+  }
+
   // Single Repo Details (FR)
   async renderRepoDetails(rawUrl: string, el: HTMLElement) {
     el.empty();
@@ -487,7 +604,7 @@ export default class ForgejoPlugin extends Plugin {
 
         return [
           `<a href="${repo.html_url}" target="_blank">${repo.name}</a>`,
-          repo.private ? '🔒 Private' : '🌐 Public',
+          this.renderVisibility(repo.private),
           `${openI.length} / ${closedI.length}`,
           `${openP.length} / ${closedP.length}`,
           this.formatDate(repo.created_at),
@@ -530,7 +647,7 @@ export default class ForgejoPlugin extends Plugin {
       const tr = tbody.createEl('tr');
       for (const cell of rowContent) {
         const td = tr.createEl('td');
-        if (cell.includes('<a ') || cell.includes('<div ') || cell.includes('<span ') || cell.includes('<img ')) {
+        if (cell.includes('<a ') || cell.includes('<div ') || cell.includes('<span ') || cell.includes('<img ') || cell.includes('<svg ')) {
           td.innerHTML = cell;
         } else {
           td.textContent = cell;
@@ -553,7 +670,7 @@ export default class ForgejoPlugin extends Plugin {
         const tr = tbody.createEl('tr');
         tr.createEl('td', { text: key, attr: { style: 'font-weight: bold; width: 30%;' } });
         const tdVal = tr.createEl('td');
-        if (val.includes('<a ') || val.includes('<div ') || val.includes('<span ') || val.includes('<img ')) tdVal.innerHTML = val;
+        if (val.includes('<a ') || val.includes('<div ') || val.includes('<span ') || val.includes('<img ') || val.includes('<svg ')) tdVal.innerHTML = val;
         else tdVal.textContent = val;
       }
     } else {
@@ -570,7 +687,7 @@ export default class ForgejoPlugin extends Plugin {
       const tr = tbody.createEl('tr');
       for (const [, val] of rows) {
         const tdVal = tr.createEl('td');
-        if (val.includes('<a ') || val.includes('<div ') || val.includes('<span ') || val.includes('<img ')) tdVal.innerHTML = val;
+        if (val.includes('<a ') || val.includes('<div ') || val.includes('<span ') || val.includes('<img ') || val.includes('<svg ')) tdVal.innerHTML = val;
         else tdVal.textContent = val;
       }
     }
@@ -598,6 +715,7 @@ class ForgejoSettingTab extends PluginSettingTab {
     list.createEl('li', { text: 'Single Items: ```FIS or ```FPR + Item URL' });
     list.createEl('li', { text: 'Issue Lists: ```FIS-ALL, ```FIS-OPEN, ```FIS-CLOSED + Repo URL' });
     list.createEl('li', { text: 'PR Lists: ```FPR-ALL, ```FPR-OPEN, ```FPR-CLOSED + Repo URL' });
+    list.createEl('li', { text: 'User PRs: ```FPR-LIST, ```FPR-LIST-OPEN, ```FPR-LIST-CLOSED + Username' });
     list.createEl('li', { text: 'Repo Issues: ```FRI, ```FRI-OPEN, ```FRI-CLOSED + Repo URL' });
     list.createEl('li', { text: 'Single Repo Details: ```FR + Repo URL' });
     list.createEl('li', { text: 'All Repositories Overview: ```FR-ALL (No URL needed)' });
@@ -626,6 +744,26 @@ class ForgejoSettingTab extends PluginSettingTab {
             await this.plugin.saveSettings();
           });
       });
+
+    new Setting(containerEl)
+      .setName('Enable Caching')
+      .setDesc('Cache API responses locally to prevent unnecessary network requests until interval expires.')
+      .addToggle(toggle => toggle
+        .setValue(this.plugin.settings.enableCache)
+        .onChange(async (value) => {
+          this.plugin.settings.enableCache = value;
+          await this.plugin.saveSettings();
+        }));
+
+    new Setting(containerEl)
+      .setName('Use SVG Icons')
+      .setDesc('Render custom SVG vectors instead of standard system Emojis for status and visibility.')
+      .addToggle(toggle => toggle
+        .setValue(this.plugin.settings.useSvgIcons)
+        .onChange(async (value) => {
+          this.plugin.settings.useSvgIcons = value;
+          await this.plugin.saveSettings();
+        }));
 
     new Setting(containerEl)
       .setName('Table Layout')
