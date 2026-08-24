@@ -6,6 +6,9 @@
     "build": "tsc -noEmit && esbuild main.ts --bundle --external:obsidian --format=cjs --target=es2020 --outfile=main.js",
     "dev": "esbuild main.ts --bundle --external:obsidian --format=cjs --target=es2020 --outfile=main.js --watch"
   },
+  "keywords": [],
+  "author": "RonDev",
+  "license": "MIT",
   "devDependencies": {
     "@types/node": "^20.0.0",
     "esbuild": "^0.20.0",
