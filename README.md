@@ -54,3 +54,91 @@ Render detailed information about a specific issue or pull request.
 https://forgejo.yourdomain.com/owner/repo/issues/42
 ```
 ````
+
+````markdown
+```FPR
+https://forgejo.yourdomain.com/owner/repo/pulls/15
+```
+````
+
+### 2. Repository Issue Lists
+
+Render lists of issues for a specific repository.
+- All Issues: `FIS-ALL` or `FRI`
+- Open Issues: `FIS-OPEN` or `FRI-OPEN`
+- Closed Issues: `FIS-CLOSED` or `FRI-CLOSED`
+
+````markdown
+```FIS-OPEN
+https://forgejo.yourdomain.com/owner/repo
+```
+````
+
+### 3. Repository Pull Request Lists
+
+Render pull requests filtered by status for a specific repository.
+- All PRs: `FPR-ALL`
+- Open PRs: `FPR-OPEN`
+- Closed PRs: `FPR-CLOSED`
+
+````markdown
+```FPR-OPEN
+https://forgejo.yourdomain.com/owner/repo
+```
+````
+
+### 4. User Pull Requests
+
+Display pull requests created by a specific user across all accessible repositories.
+- All User PRs: `FPR-LIST`
+- Open User PRs: `FPR-LIST-OPEN`
+- Closed User PRs: `FPR-LIST-CLOSED`
+
+````markdown
+```FPR-LIST-OPEN
+octocat
+```
+```` 
+
+### 5. Repository Summaries & Overview
+
+- Single Repository Overview: Displays metrics (issues count, open PRs, license, last push date, latest release tag).
+
+````markdown
+```FR
+https://forgejo.yourdomain.com/owner/repo
+```
+````
+
+- All User Repositories Overview: Displays a comprehensive overview table of all repositories accessible by the configured API token (no URL required).
+
+````markdown
+```FR-ALL
+```
+```` 
+
+## 🎨 Codeblock Syntax Quick Reference
+
+| **Codeblock**               | **Scope**    | **Argument** | **Description**                                |
+| --------------------------- | ------------ | ------------ | ---------------------------------------------- |
+| `FIS`                       | Single Issue | Issue URL    | Renders detailed view of a single issue        |
+| `FPR`                       | Single PR    | PR URL       | Renders detailed view of a single pull request |
+| `FIS-ALL` / `FRI`           | Issues       | Repo URL     | Lists all issues in a repository               |
+| `FIS-OPEN` / `FRI-OPEN`     | Issues       | Repo URL     | Lists open issues in a repository              |
+| `FIS-CLOSED` / `FRI-CLOSED` | Issues       | Repo URL     | Lists closed issues in a repository            |
+| `FPR-ALL`                   | PRs          | Repo URL     | Lists all pull requests in a repository        |
+| `FPR-OPEN`                  | PRs          | Repo URL     | Lists open pull requests in a repository       |
+| `FPR-CLOSED`                | PRs          | Repo URL     | Lists closed pull requests in a repository     |
+| `FPR-LIST`                  | User PRs     | Username     | Lists all PRs authored by user                 |
+| `FPR-LIST-OPEN`             | User PRs     | Username     | Lists open PRs authored by user                |
+| `FPR-LIST-CLOSED`           | User PRs     | Username     | Lists closed PRs authored by user              |
+| `FR`                        | Repository   | Repo URL     | Displays single repo summary & metrics         |
+| `FR-ALL`                     | All Repos    | *None*       | Overview table of all authenticated user repos |
+
+## ☕ Support & Donation
+
+If you find this plugin useful, consider supporting its ongoing development!
+
+[![Buy me a coffee](https://mini-badges.rondev.de/icon/cuptogo/Buy_me_a_Coffee-c1d82f-222/for-the-badge "Buy me a coffee")](https://www.buymeacoffee.com/RonDev)
+[![Buy me a coffee](https://mini-badges.rondev.de/icon/cuptogo/ko--fi.com-c1d82f-222/for-the-badge "Buy me a coffee")](https://ko-fi.com/U6U31EV2VS)
+[![Pizza Power](https://mini-badges.rondev.de/icon/paypal/PayPal/for-the-badge "Pizza Power")](https://www.paypal.com/donate/?hosted_button_id=PWY939TPCQ3RA)
