@@ -1,21 +1,42 @@
-import { App, Plugin, PluginSettingTab, Setting, requestUrl, RequestUrlParam, Notice } from 'obsidian';
+import {
+  App,
+  Plugin,
+  PluginSettingTab,
+  Setting,
+  requestUrl,
+  RequestUrlParam,
+  Notice,
+} from "obsidian";
 
 interface ForgejoSettings {
   serverUrl: string;
   apiToken: string;
-  tableLayout: 'vertical' | 'horizontal';
+  tableLayout: "vertical" | "horizontal";
   refreshInterval: number;
-  themeStyle: 'dark' | 'light' | 'blue' | 'purple' | 'mono' | 'sepia' | 'nord' | 'dracula' | 'cyberpunk' | 'midnight' | 'slate' | 'teal' | 'amber';
+  themeStyle:
+    | "dark"
+    | "light"
+    | "blue"
+    | "purple"
+    | "mono"
+    | "sepia"
+    | "nord"
+    | "dracula"
+    | "cyberpunk"
+    | "midnight"
+    | "slate"
+    | "teal"
+    | "amber";
   enableCache: boolean;
 }
 
 const DEFAULT_SETTINGS: ForgejoSettings = {
-  serverUrl: 'https://my-forgejo-instance.com',
-  apiToken: '',
-  tableLayout: 'vertical',
+  serverUrl: "https://my-forgejo-instance.com",
+  apiToken: "",
+  tableLayout: "vertical",
   refreshInterval: 60000,
-  themeStyle: 'light',
-  enableCache: false
+  themeStyle: "light",
+  enableCache: false,
 };
 
 interface CacheData {
@@ -81,29 +102,29 @@ const SVG_CLOSED_LABEL = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4
 
 // Helper function against XSS: Sanitize String inputs
 function escapeHtml(str: string): string {
-  if (!str) return '';
+  if (!str) return "";
   return str
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 }
 
 // Helper to validate safe URLs (preventing javascript: or arbitrary origins)
 function sanitizeUrl(rawUrl: string, expectedHostUrl?: string): string {
   try {
     const url = new URL(rawUrl);
-    if (url.protocol !== 'http:' && url.protocol !== 'https:') {
-      return '#';
+    if (url.protocol !== "http:" && url.protocol !== "https:") {
+      return "#";
     }
     if (expectedHostUrl) {
       const expected = new URL(expectedHostUrl);
-      if (url.origin !== expected.origin) return '#';
+      if (url.origin !== expected.origin) return "#";
     }
     return url.toString();
   } catch {
-    return '#';
+    return "#";
   }
 }
 
@@ -120,34 +141,66 @@ export default class ForgejoPlugin extends Plugin {
     this.injectStyles();
     this.addSettingTab(new ForgejoSettingTab(this.app, this));
 
-    this.registerMarkdownCodeBlockProcessor('FPR', (source, el) => this.renderForgejoSingleItem(source.trim(), el, 'pr'));
-    this.registerMarkdownCodeBlockProcessor('FIS', (source, el) => this.renderForgejoSingleItem(source.trim(), el, 'issue'));
+    this.registerMarkdownCodeBlockProcessor("FPR", (source, el) =>
+      this.renderForgejoSingleItem(source.trim(), el, "pr"),
+    );
+    this.registerMarkdownCodeBlockProcessor("FIS", (source, el) =>
+      this.renderForgejoSingleItem(source.trim(), el, "issue"),
+    );
 
-    this.registerMarkdownCodeBlockProcessor('FIS-ALL', (source, el) => this.renderForgejoList(source.trim(), el, 'issue', 'all'));
-    this.registerMarkdownCodeBlockProcessor('FIS-OPEN', (source, el) => this.renderForgejoList(source.trim(), el, 'issue', 'open'));
-    this.registerMarkdownCodeBlockProcessor('FIS-CLOSED', (source, el) => this.renderForgejoList(source.trim(), el, 'issue', 'closed'));
+    this.registerMarkdownCodeBlockProcessor("FIS-ALL", (source, el) =>
+      this.renderForgejoList(source.trim(), el, "issue", "all"),
+    );
+    this.registerMarkdownCodeBlockProcessor("FIS-OPEN", (source, el) =>
+      this.renderForgejoList(source.trim(), el, "issue", "open"),
+    );
+    this.registerMarkdownCodeBlockProcessor("FIS-CLOSED", (source, el) =>
+      this.renderForgejoList(source.trim(), el, "issue", "closed"),
+    );
 
-    this.registerMarkdownCodeBlockProcessor('FPR-ALL', (source, el) => this.renderForgejoList(source.trim(), el, 'pr', 'all'));
-    this.registerMarkdownCodeBlockProcessor('FPR-OPEN', (source, el) => this.renderForgejoList(source.trim(), el, 'pr', 'open'));
-    this.registerMarkdownCodeBlockProcessor('FPR-CLOSED', (source, el) => this.renderForgejoList(source.trim(), el, 'pr', 'closed'));
+    this.registerMarkdownCodeBlockProcessor("FPR-ALL", (source, el) =>
+      this.renderForgejoList(source.trim(), el, "pr", "all"),
+    );
+    this.registerMarkdownCodeBlockProcessor("FPR-OPEN", (source, el) =>
+      this.renderForgejoList(source.trim(), el, "pr", "open"),
+    );
+    this.registerMarkdownCodeBlockProcessor("FPR-CLOSED", (source, el) =>
+      this.renderForgejoList(source.trim(), el, "pr", "closed"),
+    );
 
-    this.registerMarkdownCodeBlockProcessor('FPR-LIST', (source, el) => this.renderUserPRList(source.trim(), el, 'all'));
-    this.registerMarkdownCodeBlockProcessor('FPR-LIST-OPEN', (source, el) => this.renderUserPRList(source.trim(), el, 'open'));
-    this.registerMarkdownCodeBlockProcessor('FPR-LIST-CLOSED', (source, el) => this.renderUserPRList(source.trim(), el, 'closed'));
+    this.registerMarkdownCodeBlockProcessor("FPR-LIST", (source, el) =>
+      this.renderUserPRList(source.trim(), el, "all"),
+    );
+    this.registerMarkdownCodeBlockProcessor("FPR-LIST-OPEN", (source, el) =>
+      this.renderUserPRList(source.trim(), el, "open"),
+    );
+    this.registerMarkdownCodeBlockProcessor("FPR-LIST-CLOSED", (source, el) =>
+      this.renderUserPRList(source.trim(), el, "closed"),
+    );
 
-    this.registerMarkdownCodeBlockProcessor('FRI', (source, el) => this.renderForgejoList(source.trim(), el, 'issue', 'all'));
-    this.registerMarkdownCodeBlockProcessor('FRI-OPEN', (source, el) => this.renderForgejoList(source.trim(), el, 'issue', 'open'));
-    this.registerMarkdownCodeBlockProcessor('FRI-CLOSED', (source, el) => this.renderForgejoList(source.trim(), el, 'issue', 'closed'));
+    this.registerMarkdownCodeBlockProcessor("FRI", (source, el) =>
+      this.renderForgejoList(source.trim(), el, "issue", "all"),
+    );
+    this.registerMarkdownCodeBlockProcessor("FRI-OPEN", (source, el) =>
+      this.renderForgejoList(source.trim(), el, "issue", "open"),
+    );
+    this.registerMarkdownCodeBlockProcessor("FRI-CLOSED", (source, el) =>
+      this.renderForgejoList(source.trim(), el, "issue", "closed"),
+    );
 
-    this.registerMarkdownCodeBlockProcessor('FR', (source, el) => this.renderRepoDetails(source.trim(), el));
-    this.registerMarkdownCodeBlockProcessor('FR-ALL', (source, el) => this.renderAllUserRepos(el));
+    this.registerMarkdownCodeBlockProcessor("FR", (source, el) =>
+      this.renderRepoDetails(source.trim(), el),
+    );
+    this.registerMarkdownCodeBlockProcessor("FR-ALL", (source, el) =>
+      this.renderAllUserRepos(el),
+    );
 
     this.startAutoRefresh();
   }
 
   onunload() {
     this.stopAutoRefresh();
-    const styleEl = document.getElementById('forgejo-plugin-styles');
+    const styleEl = document.getElementById("forgejo-plugin-styles");
     if (styleEl) styleEl.remove();
   }
 
@@ -164,55 +217,152 @@ export default class ForgejoPlugin extends Plugin {
 
   async saveCache() {
     try {
-      await this.app.vault.adapter.write(this.cachePath, JSON.stringify(this.cacheMemory, null, 2));
+      await this.app.vault.adapter.write(
+        this.cachePath,
+        JSON.stringify(this.cacheMemory, null, 2),
+      );
     } catch (err) {
-      console.error('Failed to save Forgejo cache', err);
+      console.error("Failed to save Forgejo cache", err);
     }
   }
 
   injectStyles() {
-    let styleEl = document.getElementById('forgejo-plugin-styles') as HTMLStyleElement;
+    let styleEl = document.getElementById(
+      "forgejo-plugin-styles",
+    ) as HTMLStyleElement;
     if (!styleEl) {
-      styleEl = document.createElement('style');
-      styleEl.id = 'forgejo-plugin-styles';
+      styleEl = document.createElement("style");
+      styleEl.id = "forgejo-plugin-styles";
       document.head.appendChild(styleEl);
     }
 
-    let headerBg = 'var(--background-secondary-alt, var(--background-secondary))';
-    let subHeaderBg = 'var(--background-secondary)';
-    let textHeader = 'var(--text-normal)';
-    let borderCol = 'var(--table-border, var(--border-color, #444))';
-    let rowBgPrimary = 'var(--background-primary)';
-    let zebraBg = 'var(--background-secondary-alt)';
-    let rowTextColor = 'var(--text-normal)';
+    let headerBg =
+      "var(--background-secondary-alt, var(--background-secondary))";
+    let subHeaderBg = "var(--background-secondary)";
+    let textHeader = "var(--text-normal)";
+    let borderCol = "var(--table-border, var(--border-color, #444))";
+    let rowBgPrimary = "var(--background-primary)";
+    let zebraBg = "var(--background-secondary-alt)";
+    let rowTextColor = "var(--text-normal)";
 
     switch (this.settings.themeStyle) {
       case "dark":
-        headerBg = "#1e1e2e"; subHeaderBg = "#2d2d3d"; textHeader = "#cdd6f4"; borderCol = "#45475a"; rowBgPrimary = "#1e1e2e"; zebraBg = "#181825"; rowTextColor = "#cdd6f4"; break;
+        headerBg = "#1e1e2e";
+        subHeaderBg = "#2d2d3d";
+        textHeader = "#cdd6f4";
+        borderCol = "#45475a";
+        rowBgPrimary = "#1e1e2e";
+        zebraBg = "#181825";
+        rowTextColor = "#cdd6f4";
+        break;
       case "light":
-        headerBg = "#e6e9ef"; subHeaderBg = "#dce0e8"; textHeader = "#4c4f69"; borderCol = "#bcc0cc"; rowBgPrimary = "#ffffff"; zebraBg = "#f2f4f8"; rowTextColor = "#4c4f69"; break;
+        headerBg = "#e6e9ef";
+        subHeaderBg = "#dce0e8";
+        textHeader = "#4c4f69";
+        borderCol = "#bcc0cc";
+        rowBgPrimary = "#ffffff";
+        zebraBg = "#f2f4f8";
+        rowTextColor = "#4c4f69";
+        break;
       case "blue":
-        headerBg = "#1e3a8a"; subHeaderBg = "#1d4ed8"; textHeader = "#ffffff"; borderCol = "#3b82f6"; rowBgPrimary = "#ffffff"; zebraBg = "#eff6ff"; rowTextColor = "#1e293b"; break;
+        headerBg = "#1e3a8a";
+        subHeaderBg = "#1d4ed8";
+        textHeader = "#ffffff";
+        borderCol = "#3b82f6";
+        rowBgPrimary = "#ffffff";
+        zebraBg = "#eff6ff";
+        rowTextColor = "#1e293b";
+        break;
       case "purple":
-        headerBg = "#581c87"; subHeaderBg = "#7e22ce"; textHeader = "#ffffff"; borderCol = "#a855f7"; rowBgPrimary = "#ffffff"; zebraBg = "#faf5ff"; rowTextColor = "#2e1065"; break;
+        headerBg = "#581c87";
+        subHeaderBg = "#7e22ce";
+        textHeader = "#ffffff";
+        borderCol = "#a855f7";
+        rowBgPrimary = "#ffffff";
+        zebraBg = "#faf5ff";
+        rowTextColor = "#2e1065";
+        break;
       case "mono":
-        headerBg = "#18181b"; subHeaderBg = "#27272a"; textHeader = "#ffffff"; borderCol = "#71717a"; rowBgPrimary = "#ffffff"; zebraBg = "#f4f4f5"; rowTextColor = "#18181b"; break;
+        headerBg = "#18181b";
+        subHeaderBg = "#27272a";
+        textHeader = "#ffffff";
+        borderCol = "#71717a";
+        rowBgPrimary = "#ffffff";
+        zebraBg = "#f4f4f5";
+        rowTextColor = "#18181b";
+        break;
       case "sepia":
-        headerBg = "#78350f"; subHeaderBg = "#92400e"; textHeader = "#fff7ed"; borderCol = "#d97706"; rowBgPrimary = "#fffbeb"; zebraBg = "#fef3c7"; rowTextColor = "#451a03"; break;
+        headerBg = "#78350f";
+        subHeaderBg = "#92400e";
+        textHeader = "#fff7ed";
+        borderCol = "#d97706";
+        rowBgPrimary = "#fffbeb";
+        zebraBg = "#fef3c7";
+        rowTextColor = "#451a03";
+        break;
       case "nord":
-        headerBg = "#2e3440"; subHeaderBg = "#3b4252"; textHeader = "#eceff4"; borderCol = "#4c566a"; rowBgPrimary = "#eceff4"; zebraBg = "#e5e9f0"; rowTextColor = "#2e3440"; break;
+        headerBg = "#2e3440";
+        subHeaderBg = "#3b4252";
+        textHeader = "#eceff4";
+        borderCol = "#4c566a";
+        rowBgPrimary = "#eceff4";
+        zebraBg = "#e5e9f0";
+        rowTextColor = "#2e3440";
+        break;
       case "dracula":
-        headerBg = "#282a36"; subHeaderBg = "#44475a"; textHeader = "#f8f8f2"; borderCol = "#6272a4"; rowBgPrimary = "#282a36"; zebraBg = "#21222c"; rowTextColor = "#f8f8f2"; break;
+        headerBg = "#282a36";
+        subHeaderBg = "#44475a";
+        textHeader = "#f8f8f2";
+        borderCol = "#6272a4";
+        rowBgPrimary = "#282a36";
+        zebraBg = "#21222c";
+        rowTextColor = "#f8f8f2";
+        break;
       case "cyberpunk":
-        headerBg = "#18181b"; subHeaderBg = "#27272a"; textHeader = "#f0abfc"; borderCol = "#d946ef"; rowBgPrimary = "#09090b"; zebraBg = "#18181b"; rowTextColor = "#e879f9"; break;
+        headerBg = "#18181b";
+        subHeaderBg = "#27272a";
+        textHeader = "#f0abfc";
+        borderCol = "#d946ef";
+        rowBgPrimary = "#09090b";
+        zebraBg = "#18181b";
+        rowTextColor = "#e879f9";
+        break;
       case "midnight":
-        headerBg = "#0f172a"; subHeaderBg = "#1e293b"; textHeader = "#e2e8f0"; borderCol = "#334155"; rowBgPrimary = "#111827"; zebraBg = "#0f172a"; rowTextColor = "#e2e8f0"; break;
+        headerBg = "#0f172a";
+        subHeaderBg = "#1e293b";
+        textHeader = "#e2e8f0";
+        borderCol = "#334155";
+        rowBgPrimary = "#111827";
+        zebraBg = "#0f172a";
+        rowTextColor = "#e2e8f0";
+        break;
       case "slate":
-        headerBg = "#1e293b"; subHeaderBg = "#334155"; textHeader = "#f8fafc"; borderCol = "#64748b"; rowBgPrimary = "#ffffff"; zebraBg = "#f8fafc"; rowTextColor = "#1e293b"; break;
+        headerBg = "#1e293b";
+        subHeaderBg = "#334155";
+        textHeader = "#f8fafc";
+        borderCol = "#64748b";
+        rowBgPrimary = "#ffffff";
+        zebraBg = "#f8fafc";
+        rowTextColor = "#1e293b";
+        break;
       case "teal":
-        headerBg = "#134e4a"; subHeaderBg = "#0f766e"; textHeader = "#ffffff"; borderCol = "#14b8a6"; rowBgPrimary = "#ffffff"; zebraBg = "#f0fdfa"; rowTextColor = "#134e4a"; break;
+        headerBg = "#134e4a";
+        subHeaderBg = "#0f766e";
+        textHeader = "#ffffff";
+        borderCol = "#14b8a6";
+        rowBgPrimary = "#ffffff";
+        zebraBg = "#f0fdfa";
+        rowTextColor = "#134e4a";
+        break;
       case "amber":
-        headerBg = "#92400e"; subHeaderBg = "#b45309"; textHeader = "#ffffff"; borderCol = "#f59e0b"; rowBgPrimary = "#ffffff"; zebraBg = "#fffbeb"; rowTextColor = "#451a03"; break;
+        headerBg = "#92400e";
+        subHeaderBg = "#b45309";
+        textHeader = "#ffffff";
+        borderCol = "#f59e0b";
+        rowBgPrimary = "#ffffff";
+        zebraBg = "#fffbeb";
+        rowTextColor = "#451a03";
+        break;
     }
 
     styleEl.textContent = `
@@ -244,11 +394,16 @@ export default class ForgejoPlugin extends Plugin {
     this.settings = Object.assign({}, DEFAULT_SETTINGS, data);
 
     // Unobfuscate stored Token from storage
-    if (this.settings.apiToken && this.settings.apiToken.startsWith('enc_b64:')) {
+    if (
+      this.settings.apiToken &&
+      this.settings.apiToken.startsWith("enc_b64:")
+    ) {
       try {
-        this.settings.apiToken = atob(this.settings.apiToken.replace('enc_b64:', ''));
+        this.settings.apiToken = atob(
+          this.settings.apiToken.replace("enc_b64:", ""),
+        );
       } catch {
-        this.settings.apiToken = '';
+        this.settings.apiToken = "";
       }
     }
   }
@@ -258,7 +413,7 @@ export default class ForgejoPlugin extends Plugin {
     const rawToken = this.settings.apiToken;
     const settingsToSave = Object.assign({}, this.settings);
     if (rawToken) {
-      settingsToSave.apiToken = 'enc_b64:' + btoa(rawToken);
+      settingsToSave.apiToken = "enc_b64:" + btoa(rawToken);
     }
 
     await this.saveData(settingsToSave);
@@ -268,8 +423,8 @@ export default class ForgejoPlugin extends Plugin {
   }
 
   refreshViews() {
-    this.app.workspace.iterateAllLeaves(leaf => {
-      if (leaf.view && leaf.view.getViewType() === 'markdown') {
+    this.app.workspace.iterateAllLeaves((leaf) => {
+      if (leaf.view && leaf.view.getViewType() === "markdown") {
         const view = leaf.view as any;
         if (view.previewMode) {
           view.previewMode.rerender(true);
@@ -284,7 +439,10 @@ export default class ForgejoPlugin extends Plugin {
   startAutoRefresh() {
     this.stopAutoRefresh();
     if (this.settings.refreshInterval > 0) {
-      this.intervalId = window.setInterval(() => this.refreshViews(), this.settings.refreshInterval);
+      this.intervalId = window.setInterval(
+        () => this.refreshViews(),
+        this.settings.refreshInterval,
+      );
     }
   }
 
@@ -295,24 +453,30 @@ export default class ForgejoPlugin extends Plugin {
     }
   }
 
-  parseUrl(rawUrl: string): { owner: string; repo: string; index?: string } | null {
+  parseUrl(
+    rawUrl: string,
+  ): { owner: string; repo: string; index?: string } | null {
     try {
       let cleanUrl = rawUrl.trim();
       const mdMatch = cleanUrl.match(/\((https?:\/\/[^\)]+)\)/);
       if (mdMatch) cleanUrl = mdMatch[1];
-      cleanUrl = cleanUrl.replace(/[\[\]'"]/g, '').trim();
+      cleanUrl = cleanUrl.replace(/[\[\]'"]/g, "").trim();
 
       const url = new URL(cleanUrl);
-      
+
       // Strict origin validation against configured server URL
       const configuredUrl = new URL(this.settings.serverUrl);
       if (url.origin !== configuredUrl.origin) {
         return null;
       }
 
-      const parts = url.pathname.split('/').filter(p => p.length > 0);
+      const parts = url.pathname.split("/").filter((p) => p.length > 0);
       if (parts.length >= 2) {
-        return { owner: parts[0], repo: parts[1], index: parts[3] || undefined };
+        return {
+          owner: parts[0],
+          repo: parts[1],
+          index: parts[3] || undefined,
+        };
       }
     } catch {
       return null;
@@ -330,29 +494,35 @@ export default class ForgejoPlugin extends Plugin {
       }
     }
 
-    if (!this.settings.serverUrl) throw new Error('Server URL not set');
-    const baseUrl = this.settings.serverUrl.replace(/\/$/, '');
-    
+    if (!this.settings.serverUrl) throw new Error("Server URL not set");
+    const baseUrl = this.settings.serverUrl.replace(/\/$/, "");
+
     // Strict URL construction and protocol enforcement
-    const targetUrl = new URL(`${baseUrl}/api/v1/${endpoint.replace(/^\//, '')}`);
+    const targetUrl = new URL(
+      `${baseUrl}/api/v1/${endpoint.replace(/^\//, "")}`,
+    );
     const configuredUrl = new URL(this.settings.serverUrl);
-    
-    if (targetUrl.origin !== configuredUrl.origin || (targetUrl.protocol !== 'http:' && targetUrl.protocol !== 'https:')) {
-      throw new Error('Blocked unauthorized request destination');
+
+    if (
+      targetUrl.origin !== configuredUrl.origin ||
+      (targetUrl.protocol !== "http:" && targetUrl.protocol !== "https:")
+    ) {
+      throw new Error("Blocked unauthorized request destination");
     }
 
     const options: RequestUrlParam = {
       url: targetUrl.toString(),
-      method: 'GET',
+      method: "GET",
       headers: {
-        'Accept': 'application/json',
-        'Authorization': `token ${this.settings.apiToken}`
-      }
+        Accept: "application/json",
+        Authorization: `token ${this.settings.apiToken}`,
+      },
     };
 
     const res = await requestUrl(options);
-    if (res.status >= 400) throw new Error(`Forgejo API error HTTP ${res.status}`);
-    
+    if (res.status >= 400)
+      throw new Error(`Forgejo API error HTTP ${res.status}`);
+
     const data = res.json as T;
 
     if (this.settings.enableCache) {
@@ -363,18 +533,24 @@ export default class ForgejoPlugin extends Plugin {
     return data;
   }
 
-  async fetchRawFile(owner: string, repo: string, filepath: string): Promise<string | null> {
+  async fetchRawFile(
+    owner: string,
+    repo: string,
+    filepath: string,
+  ): Promise<string | null> {
     try {
-      const baseUrl = this.settings.serverUrl.replace(/\/$/, '');
-      const targetUrl = new URL(`${baseUrl}/api/v1/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/raw/${filepath.replace(/^\//, '')}`);
+      const baseUrl = this.settings.serverUrl.replace(/\/$/, "");
+      const targetUrl = new URL(
+        `${baseUrl}/api/v1/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/raw/${filepath.replace(/^\//, "")}`,
+      );
       const configuredUrl = new URL(this.settings.serverUrl);
 
       if (targetUrl.origin !== configuredUrl.origin) return null;
 
       const options: RequestUrlParam = {
         url: targetUrl.toString(),
-        method: 'GET',
-        headers: { 'Authorization': `token ${this.settings.apiToken}` }
+        method: "GET",
+        headers: { Authorization: `token ${this.settings.apiToken}` },
       };
       const res = await requestUrl(options);
       if (res.status === 200) return res.text;
@@ -385,51 +561,71 @@ export default class ForgejoPlugin extends Plugin {
   }
 
   async detectLicense(owner: string, repo: string): Promise<string> {
-    const files = ["LICENSE", "LICENSE.md", "LICENSE.txt", "COPYING", "COPYING.md", "COPYING.txt"];
+    const files = [
+      "LICENSE",
+      "LICENSE.md",
+      "LICENSE.txt",
+      "COPYING",
+      "COPYING.md",
+      "COPYING.txt",
+    ];
     for (const file of files) {
       const content = await this.fetchRawFile(owner, repo, file);
       if (content) {
         const text = content.toUpperCase();
-        if (text.includes("MIT LICENSE") || text.includes("PERMISSION IS HEREBY GRANTED")) return "MIT";
+        if (
+          text.includes("MIT LICENSE") ||
+          text.includes("PERMISSION IS HEREBY GRANTED")
+        )
+          return "MIT";
         if (text.includes("APACHE LICENSE")) return "Apache-2.0";
-        if (text.includes("GNU GENERAL PUBLIC LICENSE") || text.includes("GPL")) {
+        if (
+          text.includes("GNU GENERAL PUBLIC LICENSE") ||
+          text.includes("GPL")
+        ) {
           if (text.includes("VERSION 3")) return "GPL-3.0";
           if (text.includes("VERSION 2")) return "GPL-2.0";
           return "GPL";
         }
-        if (text.includes("GNU AFFERO GENERAL PUBLIC LICENSE") || text.includes("AGPL")) return "AGPL-3.0";
+        if (
+          text.includes("GNU AFFERO GENERAL PUBLIC LICENSE") ||
+          text.includes("AGPL")
+        )
+          return "AGPL-3.0";
         if (text.includes("BSD 3-CLAUSE")) return "BSD-3-Clause";
         if (text.includes("BSD 2-CLAUSE")) return "BSD-2-Clause";
         if (text.includes("MOZILLA PUBLIC LICENSE")) return "MPL-2.0";
         if (text.includes("UNLICENSE")) return "Unlicense";
-        return escapeHtml(file.split('.')[0]);
+        return escapeHtml(file.split(".")[0]);
       }
     }
     return "None";
   }
 
   formatUser(user?: ForgejoUser): string {
-    if (!user) return 'N/A';
+    if (!user) return "N/A";
     const cleanLogin = escapeHtml(user.login);
-    const cleanAvatar = user.avatar_url ? sanitizeUrl(user.avatar_url) : '';
-    const avatar = cleanAvatar && cleanAvatar !== '#' 
-      ? `<img src="${cleanAvatar}" class="forgejo-avatar" alt="${cleanLogin}" />` 
-      : '';
+    const cleanAvatar = user.avatar_url ? sanitizeUrl(user.avatar_url) : "";
+    const avatar =
+      cleanAvatar && cleanAvatar !== "#"
+        ? `<img src="${cleanAvatar}" class="forgejo-avatar" alt="${cleanLogin}" />`
+        : "";
     return `<div class="forgejo-user">${avatar}<span>${cleanLogin}</span></div>`;
   }
 
   formatStatus(status: string): string {
-    const state = escapeHtml((status || 'UNKNOWN').toUpperCase());
-    const cls = state === 'OPEN' ? 'forgejo-badge-open' : 'forgejo-badge-closed';
-    const icon = state === 'OPEN' ? SVG_OPEN_LABEL : SVG_CLOSED_LABEL;
+    const state = escapeHtml((status || "UNKNOWN").toUpperCase());
+    const cls =
+      state === "OPEN" ? "forgejo-badge-open" : "forgejo-badge-closed";
+    const icon = state === "OPEN" ? SVG_OPEN_LABEL : SVG_CLOSED_LABEL;
 
     return `<span class="forgejo-badge ${cls}">${icon} ${state}</span>`;
   }
 
   formatDate(dateStr?: string | null): string {
-    if (!dateStr) return 'N/A';
+    if (!dateStr) return "N/A";
     const d = new Date(dateStr);
-    return isNaN(d.getTime()) ? 'N/A' : escapeHtml(d.toLocaleDateString());
+    return isNaN(d.getTime()) ? "N/A" : escapeHtml(d.toLocaleDateString());
   }
 
   extractPushDate(repo: ForgejoRepo): string {
@@ -439,286 +635,444 @@ export default class ForgejoPlugin extends Plugin {
 
   renderVisibility(isPrivate: boolean): string {
     const icon = isPrivate ? SVG_LOCK : SVG_GLOBE;
-    const text = isPrivate ? 'Private' : 'Public';
+    const text = isPrivate ? "Private" : "Public";
     return `<span class="forgejo-inline-icon">${icon} <span>${text}</span></span>`;
   }
 
-  async renderForgejoSingleItem(rawUrl: string, el: HTMLElement, type: 'pr' | 'issue') {
+  async renderForgejoSingleItem(
+    rawUrl: string,
+    el: HTMLElement,
+    type: "pr" | "issue",
+  ) {
     el.empty();
-    const container = el.createDiv({ cls: 'forgejo-container' });
+    const container = el.createDiv({ cls: "forgejo-container" });
     if (!this.settings.apiToken || !this.settings.serverUrl) {
-      container.createEl('p', { text: '⚠️ Please configure Server URL and API Token in settings.', cls: 'mod-warning' });
+      container.createEl("p", {
+        text: "⚠️ Please configure Server URL and API Token in settings.",
+        cls: "mod-warning",
+      });
       return;
     }
 
     const parsed = this.parseUrl(rawUrl);
     if (!parsed || !parsed.index) {
-      container.createEl('p', { text: `❌ Invalid URL or unauthorized domain: "${escapeHtml(rawUrl)}"`, cls: 'mod-warning' });
+      container.createEl("p", {
+        text: `❌ Invalid URL or unauthorized domain: "${escapeHtml(rawUrl)}"`,
+        cls: "mod-warning",
+      });
       return;
     }
 
-    container.createEl('span', { text: 'Loading...' });
+    container.createEl("span", { text: "Loading..." });
 
     try {
-      const endpoint = type === 'pr' 
-        ? `repos/${parsed.owner}/${parsed.repo}/pulls/${parsed.index}`
-        : `repos/${parsed.owner}/${parsed.repo}/issues/${parsed.index}`;
+      const endpoint =
+        type === "pr"
+          ? `repos/${parsed.owner}/${parsed.repo}/pulls/${parsed.index}`
+          : `repos/${parsed.owner}/${parsed.repo}/issues/${parsed.index}`;
 
-      if (type === 'pr') {
+      if (type === "pr") {
         const data = await this.fetchApi<ForgejoPR>(endpoint);
         container.empty();
         this.buildSingleTable(container, `Pull Request #${data.number}`, [
-          ['Title', escapeHtml(data.title || 'N/A')],
-          ['Status', this.formatStatus(data.state)],
-          ['Author', this.formatUser(data.user)],
-          ['Created', this.formatDate(data.created_at)],
-          ['Link', `<a href="${sanitizeUrl(data.html_url, this.settings.serverUrl)}" target="_blank" rel="noopener">Open</a>`]
+          ["Title", escapeHtml(data.title || "N/A")],
+          ["Status", this.formatStatus(data.state)],
+          ["Author", this.formatUser(data.user)],
+          ["Created", this.formatDate(data.created_at)],
+          [
+            "Link",
+            `<a href="${sanitizeUrl(data.html_url, this.settings.serverUrl)}" target="_blank" rel="noopener">Open</a>`,
+          ],
         ]);
       } else {
         const data = await this.fetchApi<ForgejoIssue>(endpoint);
         container.empty();
-        const labels = data.labels && data.labels.length > 0 
-          ? data.labels.map(l => escapeHtml(l.name)).join(', ') 
-          : 'None';
+        const labels =
+          data.labels && data.labels.length > 0
+            ? data.labels.map((l) => escapeHtml(l.name)).join(", ")
+            : "None";
         this.buildSingleTable(container, `Issue #${data.number}`, [
-          ['Title', escapeHtml(data.title || 'N/A')],
-          ['Status', this.formatStatus(data.state)],
-          ['Author', this.formatUser(data.user)],
-          ['Labels', labels],
-          ['Created', this.formatDate(data.created_at)],
-          ['Link', `<a href="${sanitizeUrl(data.html_url, this.settings.serverUrl)}" target="_blank" rel="noopener">Open</a>`]
+          ["Title", escapeHtml(data.title || "N/A")],
+          ["Status", this.formatStatus(data.state)],
+          ["Author", this.formatUser(data.user)],
+          ["Labels", labels],
+          ["Created", this.formatDate(data.created_at)],
+          [
+            "Link",
+            `<a href="${sanitizeUrl(data.html_url, this.settings.serverUrl)}" target="_blank" rel="noopener">Open</a>`,
+          ],
         ]);
       }
     } catch (err) {
       container.empty();
-      container.createEl('p', { text: `Fetch error: ${escapeHtml(err instanceof Error ? err.message : String(err))}`, cls: 'mod-warning' });
+      container.createEl("p", {
+        text: `Fetch error: ${escapeHtml(err instanceof Error ? err.message : String(err))}`,
+        cls: "mod-warning",
+      });
     }
   }
 
-  async renderForgejoList(rawUrl: string, el: HTMLElement, type: 'pr' | 'issue', state: 'all' | 'open' | 'closed') {
+  async renderForgejoList(
+    rawUrl: string,
+    el: HTMLElement,
+    type: "pr" | "issue",
+    state: "all" | "open" | "closed",
+  ) {
     el.empty();
-    const container = el.createDiv({ cls: 'forgejo-container' });
+    const container = el.createDiv({ cls: "forgejo-container" });
     if (!this.settings.apiToken || !this.settings.serverUrl) {
-      container.createEl('p', { text: '⚠️ Please configure Server URL and API Token in settings.', cls: 'mod-warning' });
+      container.createEl("p", {
+        text: "⚠️ Please configure Server URL and API Token in settings.",
+        cls: "mod-warning",
+      });
       return;
     }
 
     const parsed = this.parseUrl(rawUrl);
     if (!parsed) {
-      container.createEl('p', { text: `❌ Invalid Repository URL or unauthorized domain: "${escapeHtml(rawUrl)}"`, cls: 'mod-warning' });
+      container.createEl("p", {
+        text: `❌ Invalid Repository URL or unauthorized domain: "${escapeHtml(rawUrl)}"`,
+        cls: "mod-warning",
+      });
       return;
     }
 
-    container.createEl('span', { text: 'Loading list...' });
+    container.createEl("span", { text: "Loading list..." });
 
     try {
-      const endpoint = type === 'pr'
-        ? `repos/${parsed.owner}/${parsed.repo}/pulls?state=${state}`
-        : `repos/${parsed.owner}/${parsed.repo}/issues?state=${state}`;
+      const endpoint =
+        type === "pr"
+          ? `repos/${parsed.owner}/${parsed.repo}/pulls?state=${state}`
+          : `repos/${parsed.owner}/${parsed.repo}/issues?state=${state}`;
 
       const items = await this.fetchApi<any[]>(endpoint);
       container.empty();
 
-      const title = `${type === 'pr' ? 'Pull Requests' : 'Issues'} (${state.toUpperCase()}) - ${escapeHtml(parsed.owner)}/${escapeHtml(parsed.repo)}`;
-      const headers = ['ID', 'Title', 'Status', 'Author', 'Created', 'Link'];
+      const title = `${type === "pr" ? "Pull Requests" : "Issues"} (${state.toUpperCase()}) - ${escapeHtml(parsed.owner)}/${escapeHtml(parsed.repo)}`;
+      const headers = ["ID", "Title", "Status", "Author", "Created", "Link"];
 
       if (!items || items.length === 0) {
-        this.buildStructuredTable(container, title, headers, [], `No ${type === 'pr' ? 'pull requests' : 'issues'} found for state "${state}".`);
+        this.buildStructuredTable(
+          container,
+          title,
+          headers,
+          [],
+          `No ${type === "pr" ? "pull requests" : "issues"} found for state "${state}".`,
+        );
         return;
       }
 
-      const rows = items.map(item => [
+      const rows = items.map((item) => [
         `#${item.number}`,
-        escapeHtml(item.title || 'N/A'),
+        escapeHtml(item.title || "N/A"),
         this.formatStatus(item.state),
         this.formatUser(item.user),
         this.formatDate(item.created_at),
-        `<a href="${sanitizeUrl(item.html_url, this.settings.serverUrl)}" target="_blank" rel="noopener">Open</a>`
+        `<a href="${sanitizeUrl(item.html_url, this.settings.serverUrl)}" target="_blank" rel="noopener">Open</a>`,
       ]);
 
       this.buildStructuredTable(container, title, headers, rows);
     } catch (err) {
       container.empty();
-      container.createEl('p', { text: `Fetch error: ${escapeHtml(err instanceof Error ? err.message : String(err))}`, cls: 'mod-warning' });
+      container.createEl("p", {
+        text: `Fetch error: ${escapeHtml(err instanceof Error ? err.message : String(err))}`,
+        cls: "mod-warning",
+      });
     }
   }
 
-  async renderUserPRList(username: string, el: HTMLElement, state: 'all' | 'open' | 'closed') {
+  async renderUserPRList(
+    username: string,
+    el: HTMLElement,
+    state: "all" | "open" | "closed",
+  ) {
     el.empty();
-    const container = el.createDiv({ cls: 'forgejo-container' });
+    const container = el.createDiv({ cls: "forgejo-container" });
     if (!this.settings.apiToken || !this.settings.serverUrl) {
-      container.createEl('p', { text: '⚠️ Please configure Server URL and API Token in settings.', cls: 'mod-warning' });
+      container.createEl("p", {
+        text: "⚠️ Please configure Server URL and API Token in settings.",
+        cls: "mod-warning",
+      });
       return;
     }
 
-    const cleanUser = username.replace(/[\[\]'"]/g, '').trim();
+    const cleanUser = username.replace(/[\[\]'"]/g, "").trim();
     if (!cleanUser) {
-      container.createEl('p', { text: '❌ Invalid Username specified.', cls: 'mod-warning' });
+      container.createEl("p", {
+        text: "❌ Invalid Username specified.",
+        cls: "mod-warning",
+      });
       return;
     }
 
-    container.createEl('span', { text: `Loading PRs for user ${escapeHtml(cleanUser)}...` });
+    container.createEl("span", {
+      text: `Loading PRs for user ${escapeHtml(cleanUser)}...`,
+    });
 
     try {
       const endpoint = `repos/issues/search?state=${state}&type=pulls&created_by=${encodeURIComponent(cleanUser)}`;
       const response = await this.fetchApi<any>(endpoint);
-      const items: ForgejoPR[] = Array.isArray(response) ? response : (response.data || []);
-      
+      const items: ForgejoPR[] = Array.isArray(response)
+        ? response
+        : response.data || [];
+
       container.empty();
 
       const title = `Pull Requests (${state.toUpperCase()}) - User: ${escapeHtml(cleanUser)}`;
-      const headers = ['Repo', 'ID', 'Title', 'Status', 'Created', 'Link'];
+      const headers = ["Repo", "ID", "Title", "Status", "Created", "Link"];
 
       if (!items || items.length === 0) {
-        this.buildStructuredTable(container, title, headers, [], `No pull requests found for user "${escapeHtml(cleanUser)}" with state "${state}".`);
+        this.buildStructuredTable(
+          container,
+          title,
+          headers,
+          [],
+          `No pull requests found for user "${escapeHtml(cleanUser)}" with state "${state}".`,
+        );
         return;
       }
 
-      const rows = items.map(item => [
-        escapeHtml(item.repository ? item.repository.full_name : 'N/A'),
+      const rows = items.map((item) => [
+        escapeHtml(item.repository ? item.repository.full_name : "N/A"),
         `#${item.number}`,
-        escapeHtml(item.title || 'N/A'),
+        escapeHtml(item.title || "N/A"),
         this.formatStatus(item.state),
         this.formatDate(item.created_at),
-        `<a href="${sanitizeUrl(item.html_url, this.settings.serverUrl)}" target="_blank" rel="noopener">Open</a>`
+        `<a href="${sanitizeUrl(item.html_url, this.settings.serverUrl)}" target="_blank" rel="noopener">Open</a>`,
       ]);
 
       this.buildStructuredTable(container, title, headers, rows);
     } catch (err) {
       container.empty();
-      container.createEl('p', { text: `Fetch error: ${escapeHtml(err instanceof Error ? err.message : String(err))}`, cls: 'mod-warning' });
+      container.createEl("p", {
+        text: `Fetch error: ${escapeHtml(err instanceof Error ? err.message : String(err))}`,
+        cls: "mod-warning",
+      });
     }
   }
 
   async renderRepoDetails(rawUrl: string, el: HTMLElement) {
     el.empty();
-    const container = el.createDiv({ cls: 'forgejo-container' });
+    const container = el.createDiv({ cls: "forgejo-container" });
     const parsed = this.parseUrl(rawUrl);
     if (!parsed) {
-      container.createEl('p', { text: `❌ Invalid Repository URL or unauthorized domain: "${escapeHtml(rawUrl)}"`, cls: 'mod-warning' });
+      container.createEl("p", {
+        text: `❌ Invalid Repository URL or unauthorized domain: "${escapeHtml(rawUrl)}"`,
+        cls: "mod-warning",
+      });
       return;
     }
 
-    container.createEl('span', { text: 'Loading Repository Details...' });
+    container.createEl("span", { text: "Loading Repository Details..." });
 
     try {
-      const repo = await this.fetchApi<ForgejoRepo>(`repos/${parsed.owner}/${parsed.repo}`);
-      const [openIssues, closedIssues, openPRs, closedPRs, license] = await Promise.all([
-        this.fetchApi<any[]>(`repos/${parsed.owner}/${parsed.repo}/issues?state=open`).catch(() => []),
-        this.fetchApi<any[]>(`repos/${parsed.owner}/${parsed.repo}/issues?state=closed`).catch(() => []),
-        this.fetchApi<any[]>(`repos/${parsed.owner}/${parsed.repo}/pulls?state=open`).catch(() => []),
-        this.fetchApi<any[]>(`repos/${parsed.owner}/${parsed.repo}/pulls?state=closed`).catch(() => []),
-        this.detectLicense(parsed.owner, parsed.repo)
-      ]);
-      
-      let lastReleaseTag = 'None';
+      const repo = await this.fetchApi<ForgejoRepo>(
+        `repos/${parsed.owner}/${parsed.repo}`,
+      );
+      const [openIssues, closedIssues, openPRs, closedPRs, license] =
+        await Promise.all([
+          this.fetchApi<any[]>(
+            `repos/${parsed.owner}/${parsed.repo}/issues?state=open`,
+          ).catch(() => []),
+          this.fetchApi<any[]>(
+            `repos/${parsed.owner}/${parsed.repo}/issues?state=closed`,
+          ).catch(() => []),
+          this.fetchApi<any[]>(
+            `repos/${parsed.owner}/${parsed.repo}/pulls?state=open`,
+          ).catch(() => []),
+          this.fetchApi<any[]>(
+            `repos/${parsed.owner}/${parsed.repo}/pulls?state=closed`,
+          ).catch(() => []),
+          this.detectLicense(parsed.owner, parsed.repo),
+        ]);
+
+      let lastReleaseTag = "None";
       try {
-        const releases = await this.fetchApi<ForgejoRelease[]>(`repos/${parsed.owner}/${parsed.repo}/releases`);
-        if (releases && releases.length > 0) lastReleaseTag = escapeHtml(releases[0].tag_name || releases[0].name);
-      } catch { /* Suppress */ }
+        const releases = await this.fetchApi<ForgejoRelease[]>(
+          `repos/${parsed.owner}/${parsed.repo}/releases`,
+        );
+        if (releases && releases.length > 0)
+          lastReleaseTag = escapeHtml(releases[0].tag_name || releases[0].name);
+      } catch {
+        /* Suppress */
+      }
 
       container.empty();
-      const headers = ['Name', 'Issues (O/C)', 'PRs (O/C)', 'Created', 'Last Push', 'Release', 'License'];
-      const rows = [[
-        `<a href="${sanitizeUrl(repo.html_url, this.settings.serverUrl)}" target="_blank" rel="noopener">${escapeHtml(parsed.repo)}</a>`,
-        `${openIssues.length} / ${closedIssues.length}`,
-        `${openPRs.length} / ${closedPRs.length}`,
-        this.formatDate(repo.created_at),
-        this.extractPushDate(repo),
-        lastReleaseTag,
-        license
-      ]];
+      const headers = [
+        "Name",
+        "Issues (O/C)",
+        "PRs (O/C)",
+        "Created",
+        "Last Push",
+        "Release",
+        "License",
+      ];
+      const rows = [
+        [
+          `<a href="${sanitizeUrl(repo.html_url, this.settings.serverUrl)}" target="_blank" rel="noopener">${escapeHtml(parsed.repo)}</a>`,
+          `${openIssues.length} / ${closedIssues.length}`,
+          `${openPRs.length} / ${closedPRs.length}`,
+          this.formatDate(repo.created_at),
+          this.extractPushDate(repo),
+          lastReleaseTag,
+          license,
+        ],
+      ];
 
-      this.buildStructuredTable(container, `Repository: ${escapeHtml(repo.full_name)}`, headers, rows);
+      this.buildStructuredTable(
+        container,
+        `Repository: ${escapeHtml(repo.full_name)}`,
+        headers,
+        rows,
+      );
     } catch (err) {
       container.empty();
-      container.createEl('p', { text: `Fetch error: ${escapeHtml(err instanceof Error ? err.message : String(err))}`, cls: 'mod-warning' });
+      container.createEl("p", {
+        text: `Fetch error: ${escapeHtml(err instanceof Error ? err.message : String(err))}`,
+        cls: "mod-warning",
+      });
     }
   }
 
   async renderAllUserRepos(el: HTMLElement) {
     el.empty();
-    const container = el.createDiv({ cls: 'forgejo-container' });
-    container.createEl('span', { text: 'Loading All Repositories...' });
+    const container = el.createDiv({ cls: "forgejo-container" });
+    container.createEl("span", { text: "Loading All Repositories..." });
 
     try {
-      const repos = await this.fetchApi<ForgejoRepo[]>('user/repos');
+      const repos = await this.fetchApi<ForgejoRepo[]>("user/repos");
       container.empty();
 
-      const headers = ['Name', 'Visibility', 'Issues (O/C)', 'PRs (O/C)', 'Created', 'Last Push', 'Release', 'License'];
+      const headers = [
+        "Name",
+        "Visibility",
+        "Issues (O/C)",
+        "PRs (O/C)",
+        "Created",
+        "Last Push",
+        "Release",
+        "License",
+      ];
 
       if (!repos || repos.length === 0) {
-        this.buildStructuredTable(container, 'User Repositories Overview', headers, [], 'No repositories found for this account.');
+        this.buildStructuredTable(
+          container,
+          "User Repositories Overview",
+          headers,
+          [],
+          "No repositories found for this account.",
+        );
         return;
       }
 
-      const rowsData = await Promise.all(repos.map(async repo => {
-        const [openI, closedI, openP, closedP, releases, license] = await Promise.all([
-          this.fetchApi<any[]>(`repos/${repo.owner.login}/${repo.name}/issues?state=open`).catch(() => []),
-          this.fetchApi<any[]>(`repos/${repo.owner.login}/${repo.name}/issues?state=closed`).catch(() => []),
-          this.fetchApi<any[]>(`repos/${repo.owner.login}/${repo.name}/pulls?state=open`).catch(() => []),
-          this.fetchApi<any[]>(`repos/${repo.owner.login}/${repo.name}/pulls?state=closed`).catch(() => []),
-          this.fetchApi<ForgejoRelease[]>(`repos/${repo.owner.login}/${repo.name}/releases`).catch(() => []),
-          this.detectLicense(repo.owner.login, repo.name)
-        ]);
+      const rowsData = await Promise.all(
+        repos.map(async (repo) => {
+          const [openI, closedI, openP, closedP, releases, license] =
+            await Promise.all([
+              this.fetchApi<any[]>(
+                `repos/${repo.owner.login}/${repo.name}/issues?state=open`,
+              ).catch(() => []),
+              this.fetchApi<any[]>(
+                `repos/${repo.owner.login}/${repo.name}/issues?state=closed`,
+              ).catch(() => []),
+              this.fetchApi<any[]>(
+                `repos/${repo.owner.login}/${repo.name}/pulls?state=open`,
+              ).catch(() => []),
+              this.fetchApi<any[]>(
+                `repos/${repo.owner.login}/${repo.name}/pulls?state=closed`,
+              ).catch(() => []),
+              this.fetchApi<ForgejoRelease[]>(
+                `repos/${repo.owner.login}/${repo.name}/releases`,
+              ).catch(() => []),
+              this.detectLicense(repo.owner.login, repo.name),
+            ]);
 
-        const lastRelease = releases && releases.length > 0 ? escapeHtml(releases[0].tag_name || releases[0].name) : 'None';
+          const lastRelease =
+            releases && releases.length > 0
+              ? escapeHtml(releases[0].tag_name || releases[0].name)
+              : "None";
 
-        return [
-          `<a href="${sanitizeUrl(repo.html_url, this.settings.serverUrl)}" target="_blank" rel="noopener">${escapeHtml(repo.name)}</a>`,
-          this.renderVisibility(repo.private),
-          `${openI.length} / ${closedI.length}`,
-          `${openP.length} / ${closedP.length}`,
-          this.formatDate(repo.created_at),
-          this.extractPushDate(repo),
-          lastRelease,
-          license
-        ];
-      }));
+          return [
+            `<a href="${sanitizeUrl(repo.html_url, this.settings.serverUrl)}" target="_blank" rel="noopener">${escapeHtml(repo.name)}</a>`,
+            this.renderVisibility(repo.private),
+            `${openI.length} / ${closedI.length}`,
+            `${openP.length} / ${closedP.length}`,
+            this.formatDate(repo.created_at),
+            this.extractPushDate(repo),
+            lastRelease,
+            license,
+          ];
+        }),
+      );
 
-      this.buildStructuredTable(container, 'User Repositories Overview', headers, rowsData);
+      this.buildStructuredTable(
+        container,
+        "User Repositories Overview",
+        headers,
+        rowsData,
+      );
     } catch (err) {
       container.empty();
-      container.createEl('p', { text: `Fetch error: ${escapeHtml(err instanceof Error ? err.message : String(err))}`, cls: 'mod-warning' });
+      container.createEl("p", {
+        text: `Fetch error: ${escapeHtml(err instanceof Error ? err.message : String(err))}`,
+        cls: "mod-warning",
+      });
     }
   }
 
   private stripHtml(html: string): string {
-    const tmp = document.createElement('DIV');
+    const tmp = document.createElement("DIV");
     tmp.textContent = html;
-    return tmp.textContent || '';
+    return tmp.textContent || "";
   }
 
-  buildStructuredTable(parent: HTMLElement, title: string, headers: string[], rows: string[][], fallbackText?: string) {
+  buildStructuredTable(
+    parent: HTMLElement,
+    title: string,
+    headers: string[],
+    rows: string[][],
+    fallbackText?: string,
+  ) {
     let currentRows = [...rows];
     let sortColumnIndex: number | null = null;
     let sortAscending = true;
 
-    const table = parent.createEl('table', { cls: 'forgejo-table' });
-    const thead = table.createEl('thead');
+    const table = parent.createEl("table", { cls: "forgejo-table" });
+    const thead = table.createEl("thead");
 
-    const titleRow = thead.createEl('tr', { cls: 'forgejo-title-row' });
-    const titleTh = titleRow.createEl('th', { attr: { colspan: String(headers.length) } });
+    const titleRow = thead.createEl("tr", { cls: "forgejo-title-row" });
+    const titleTh = titleRow.createEl("th", {
+      attr: { colspan: String(headers.length) },
+    });
     titleTh.textContent = title;
-    titleTh.addClass('forgejo-main-header');
+    titleTh.addClass("forgejo-main-header");
 
-    const headerRow = thead.createEl('tr', { cls: 'forgejo-cols-row' });
-    const tbody = table.createEl('tbody');
+    const headerRow = thead.createEl("tr", { cls: "forgejo-cols-row" });
+    const tbody = table.createEl("tbody");
 
     const renderTbody = () => {
       tbody.empty();
       if (currentRows.length === 0) {
-        const emptyRow = tbody.createEl('tr');
-        const emptyTd = emptyRow.createEl('td', { attr: { colspan: String(headers.length) }, cls: 'forgejo-fallback-cell' });
-        emptyTd.textContent = fallbackText || 'No data available.';
+        const emptyRow = tbody.createEl("tr");
+        const emptyTd = emptyRow.createEl("td", {
+          attr: { colspan: String(headers.length) },
+          cls: "forgejo-fallback-cell",
+        });
+        emptyTd.textContent = fallbackText || "No data available.";
         return;
       }
 
       for (const rowContent of currentRows) {
-        const tr = tbody.createEl('tr');
+        const tr = tbody.createEl("tr");
         for (const cell of rowContent) {
-          const td = tr.createEl('td');
-          if (cell.includes('<a ') || cell.includes('<div ') || cell.includes('<span ') || cell.includes('<img ') || cell.includes('<svg ')) {
+          const td = tr.createEl("td");
+          if (
+            cell.includes("<a ") ||
+            cell.includes("<div ") ||
+            cell.includes("<span ") ||
+            cell.includes("<img ") ||
+            cell.includes("<svg ")
+          ) {
             td.innerHTML = cell;
           } else {
             td.textContent = cell;
@@ -730,27 +1084,32 @@ export default class ForgejoPlugin extends Plugin {
     const updateHeaders = () => {
       headerRow.empty();
       headers.forEach((h, index) => {
-        const th = headerRow.createEl('th');
-        
-        if (h.toLowerCase() === 'link') {
+        const th = headerRow.createEl("th");
+
+        if (h.toLowerCase() === "link") {
           th.textContent = h;
           return;
         }
 
         if (rows.length > 1) {
-          th.addClass('forgejo-sortable-th');
-          const wrapper = th.createDiv({ cls: 'forgejo-th-content' });
+          th.addClass("forgejo-sortable-th");
+          const wrapper = th.createDiv({ cls: "forgejo-th-content" });
           wrapper.createSpan({ text: h });
 
           const iconContainer = wrapper.createSpan();
           if (sortColumnIndex === index) {
-            iconContainer.innerHTML = sortAscending ? SVG_SORT_ASC : SVG_SORT_DESC;
+            iconContainer.innerHTML = sortAscending
+              ? SVG_SORT_ASC
+              : SVG_SORT_DESC;
           } else {
             iconContainer.innerHTML = SVG_SORT_ASC;
-            (iconContainer.firstChild as HTMLElement)?.setAttribute('style', 'opacity: 0.2;');
+            (iconContainer.firstChild as HTMLElement)?.setAttribute(
+              "style",
+              "opacity: 0.2;",
+            );
           }
 
-          th.addEventListener('click', () => {
+          th.addEventListener("click", () => {
             if (sortColumnIndex === index) {
               sortAscending = !sortAscending;
             } else {
@@ -762,19 +1121,28 @@ export default class ForgejoPlugin extends Plugin {
               const valA = this.stripHtml(a[index]).trim();
               const valB = this.stripHtml(b[index]).trim();
 
-              const numA = parseFloat(valA.replace('#', ''));
-              const numB = parseFloat(valB.replace('#', ''));
+              const numA = parseFloat(valA.replace("#", ""));
+              const numB = parseFloat(valB.replace("#", ""));
 
-              if (!isNaN(numA) && !isNaN(numB) && !valA.includes('.') && !valA.includes('/')) {
+              if (
+                !isNaN(numA) &&
+                !isNaN(numB) &&
+                !valA.includes(".") &&
+                !valA.includes("/")
+              ) {
                 return sortAscending ? numA - numB : numB - numA;
               }
 
               const parseCustomDate = (str: string): number => {
-                if (!str || str === 'N/A' || str === 'None') return 0;
-                
+                if (!str || str === "N/A" || str === "None") return 0;
+
                 const deMatch = str.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/);
                 if (deMatch) {
-                  return new Date(parseInt(deMatch[3]), parseInt(deMatch[2]) - 1, parseInt(deMatch[1])).getTime();
+                  return new Date(
+                    parseInt(deMatch[3]),
+                    parseInt(deMatch[2]) - 1,
+                    parseInt(deMatch[1]),
+                  ).getTime();
                 }
 
                 const timestamp = Date.parse(str);
@@ -788,9 +1156,15 @@ export default class ForgejoPlugin extends Plugin {
                 return sortAscending ? dateA - dateB : dateB - dateA;
               }
 
-              return sortAscending 
-                ? valA.localeCompare(valB, undefined, { numeric: true, sensitivity: 'base' })
-                : valB.localeCompare(valA, undefined, { numeric: true, sensitivity: 'base' });
+              return sortAscending
+                ? valA.localeCompare(valB, undefined, {
+                    numeric: true,
+                    sensitivity: "base",
+                  })
+                : valB.localeCompare(valA, undefined, {
+                    numeric: true,
+                    sensitivity: "base",
+                  });
             });
 
             updateHeaders();
@@ -806,40 +1180,63 @@ export default class ForgejoPlugin extends Plugin {
     renderTbody();
   }
 
-  buildSingleTable(parent: HTMLElement, typeTitle: string, rows: [string, string][]) {
-    const table = parent.createEl('table', { cls: 'forgejo-table' });
-    const thead = table.createEl('thead');
-    
-    if (this.settings.tableLayout === 'vertical') {
-      const titleRow = thead.createEl('tr', { cls: 'forgejo-title-row' });
-      const th = titleRow.createEl('th', { attr: { colspan: '2' } });
-      th.textContent = typeTitle;
-      th.addClass('forgejo-main-header');
+  buildSingleTable(
+    parent: HTMLElement,
+    typeTitle: string,
+    rows: [string, string][],
+  ) {
+    const table = parent.createEl("table", { cls: "forgejo-table" });
+    const thead = table.createEl("thead");
 
-      const tbody = table.createEl('tbody');
+    if (this.settings.tableLayout === "vertical") {
+      const titleRow = thead.createEl("tr", { cls: "forgejo-title-row" });
+      const th = titleRow.createEl("th", { attr: { colspan: "2" } });
+      th.textContent = typeTitle;
+      th.addClass("forgejo-main-header");
+
+      const tbody = table.createEl("tbody");
       for (const [key, val] of rows) {
-        const tr = tbody.createEl('tr');
-        tr.createEl('td', { text: key, attr: { style: 'font-weight: bold; width: 30%;' } });
-        const tdVal = tr.createEl('td');
-        if (val.includes('<a ') || val.includes('<div ') || val.includes('<span ') || val.includes('<img ') || val.includes('<svg ')) tdVal.innerHTML = val;
+        const tr = tbody.createEl("tr");
+        tr.createEl("td", {
+          text: key,
+          attr: { style: "font-weight: bold; width: 30%;" },
+        });
+        const tdVal = tr.createEl("td");
+        if (
+          val.includes("<a ") ||
+          val.includes("<div ") ||
+          val.includes("<span ") ||
+          val.includes("<img ") ||
+          val.includes("<svg ")
+        )
+          tdVal.innerHTML = val;
         else tdVal.textContent = val;
       }
     } else {
-      const titleRow = thead.createEl('tr', { cls: 'forgejo-title-row' });
-      const th = titleRow.createEl('th', { attr: { colspan: String(rows.length) } });
+      const titleRow = thead.createEl("tr", { cls: "forgejo-title-row" });
+      const th = titleRow.createEl("th", {
+        attr: { colspan: String(rows.length) },
+      });
       th.textContent = typeTitle;
-      th.addClass('forgejo-main-header');
+      th.addClass("forgejo-main-header");
 
-      const headerRow = thead.createEl('tr', { cls: 'forgejo-cols-row' });
+      const headerRow = thead.createEl("tr", { cls: "forgejo-cols-row" });
       for (const [key] of rows) {
-        headerRow.createEl('th', { text: key });
+        headerRow.createEl("th", { text: key });
       }
 
-      const tbody = table.createEl('tbody');
-      const tr = tbody.createEl('tr');
+      const tbody = table.createEl("tbody");
+      const tr = tbody.createEl("tr");
       for (const [, val] of rows) {
-        const tdVal = tr.createEl('td');
-        if (val.includes('<a ') || val.includes('<div ') || val.includes('<span ') || val.includes('<img ') || val.includes('<svg ')) tdVal.innerHTML = val;
+        const tdVal = tr.createEl("td");
+        if (
+          val.includes("<a ") ||
+          val.includes("<div ") ||
+          val.includes("<span ") ||
+          val.includes("<img ") ||
+          val.includes("<svg ")
+        )
+          tdVal.innerHTML = val;
         else tdVal.textContent = val;
       }
     }
@@ -858,37 +1255,60 @@ class ForgejoSettingTab extends PluginSettingTab {
     const { containerEl } = this;
     containerEl.empty();
 
-    containerEl.createEl('h2', { text: 'Forgejo Integrator Settings' });
+    containerEl.createEl("h2", { text: "Forgejo Integrator Settings" });
 
-    const infoBox = containerEl.createDiv({ cls: 'forgejo-info-box', attr: { style: 'margin-bottom: 20px; padding: 12px; background-color: var(--background-secondary); border-radius: 6px;' } });
-    infoBox.createEl('h3', { text: 'Available Codeblocks', attr: { style: 'margin-top: 0;' } });
-    const list = infoBox.createEl('ul');
-    list.createEl('li', { text: 'Single Items: ```FIS or ```FPR + Item URL' });
-    list.createEl('li', { text: 'Issue Lists: ```FIS-ALL, ```FIS-OPEN, ```FIS-CLOSED + Repo URL' });
-    list.createEl('li', { text: 'PR Lists: ```FPR-ALL, ```FPR-OPEN, ```FPR-CLOSED + Repo URL' });
-    list.createEl('li', { text: 'User PRs: ```FPR-LIST, ```FPR-LIST-OPEN, ```FPR-LIST-CLOSED + Username' });
-    list.createEl('li', { text: 'Repo Issues: ```FRI, ```FRI-OPEN, ```FRI-CLOSED + Repo URL' });
-    list.createEl('li', { text: 'Single Repo Details: ```FR + Repo URL' });
-    list.createEl('li', { text: 'All Repositories Overview: ```FR-ALL (No URL needed)' });
+    const infoBox = containerEl.createDiv({
+      cls: "forgejo-info-box",
+      attr: {
+        style:
+          "margin-bottom: 20px; padding: 12px; background-color: var(--background-secondary); border-radius: 6px;",
+      },
+    });
+    infoBox.createEl("h3", {
+      text: "Available Codeblocks",
+      attr: { style: "margin-top: 0;" },
+    });
+    const list = infoBox.createEl("ul");
+    list.createEl("li", { text: "Single Items: ```FIS or ```FPR + Item URL" });
+    list.createEl("li", {
+      text: "Issue Lists: ```FIS-ALL, ```FIS-OPEN, ```FIS-CLOSED + Repo URL",
+    });
+    list.createEl("li", {
+      text: "PR Lists: ```FPR-ALL, ```FPR-OPEN, ```FPR-CLOSED + Repo URL",
+    });
+    list.createEl("li", {
+      text: "User PRs: ```FPR-LIST, ```FPR-LIST-OPEN, ```FPR-LIST-CLOSED + Username",
+    });
+    list.createEl("li", {
+      text: "Repo Issues: ```FRI, ```FRI-OPEN, ```FRI-CLOSED + Repo URL",
+    });
+    list.createEl("li", { text: "Single Repo Details: ```FR + Repo URL" });
+    list.createEl("li", {
+      text: "All Repositories Overview: ```FR-ALL (No URL needed)",
+    });
 
     new Setting(containerEl)
-      .setName('Forgejo Server URL')
-      .setDesc('Base URL of your Forgejo instance (e.g. https://my-forgejo-instance.com)')
-      .addText(text => text
-        .setPlaceholder('https://my-forgejo-instance.com')
-        .setValue(this.plugin.settings.serverUrl)
-        .onChange(async (value) => {
-          this.plugin.settings.serverUrl = value.trim();
-          await this.plugin.saveSettings();
-        }));
-
-    new Setting(containerEl)
-      .setName('API Token')
-      .setDesc('Personal Access Token (Read permissions required)')
-      .addText(text => {
-        text.inputEl.type = 'password';
+      .setName("Forgejo Server URL")
+      .setDesc(
+        "Base URL of your Forgejo instance (e.g. https://my-forgejo-instance.com)",
+      )
+      .addText((text) =>
         text
-          .setPlaceholder('Enter your API token')
+          .setPlaceholder("https://my-forgejo-instance.com")
+          .setValue(this.plugin.settings.serverUrl)
+          .onChange(async (value) => {
+            this.plugin.settings.serverUrl = value.trim();
+            await this.plugin.saveSettings();
+          }),
+      );
+
+    new Setting(containerEl)
+      .setName("API Token")
+      .setDesc("Personal Access Token (Read permissions required)")
+      .addText((text) => {
+        text.inputEl.type = "password";
+        text
+          .setPlaceholder("Enter your API token")
           .setValue(this.plugin.settings.apiToken)
           .onChange(async (value) => {
             this.plugin.settings.apiToken = value.trim();
@@ -897,110 +1317,172 @@ class ForgejoSettingTab extends PluginSettingTab {
       });
 
     new Setting(containerEl)
-      .setName('Enable Caching')
-      .setDesc('Cache API responses locally to prevent unnecessary network requests until interval expires.')
-      .addToggle(toggle => toggle
-        .setValue(this.plugin.settings.enableCache)
-        .onChange(async (value) => {
-          this.plugin.settings.enableCache = value;
-          await this.plugin.saveSettings();
-        }));
+      .setName("Enable Caching")
+      .setDesc(
+        "Cache API responses locally to prevent unnecessary network requests until interval expires.",
+      )
+      .addToggle((toggle) =>
+        toggle
+          .setValue(this.plugin.settings.enableCache)
+          .onChange(async (value) => {
+            this.plugin.settings.enableCache = value;
+            await this.plugin.saveSettings();
+          }),
+      );
 
     new Setting(containerEl)
-      .setName('Table Layout')
-      .setDesc('Choose layout style for single item views (FIS / FPR)')
-      .addDropdown(dropdown => dropdown
-        .addOption('vertical', 'Vertical (Key / Value rows)')
-        .addOption('horizontal', 'Horizontal (Columns side-by-side)')
-        .setValue(this.plugin.settings.tableLayout)
-        .onChange(async (value) => {
-          this.plugin.settings.tableLayout = value as 'vertical' | 'horizontal';
-          await this.plugin.saveSettings();
-        }));
+      .setName("Table Layout")
+      .setDesc("Choose layout style for single item views (FIS / FPR)")
+      .addDropdown((dropdown) =>
+        dropdown
+          .addOption("vertical", "Vertical (Key / Value rows)")
+          .addOption("horizontal", "Horizontal (Columns side-by-side)")
+          .setValue(this.plugin.settings.tableLayout)
+          .onChange(async (value) => {
+            this.plugin.settings.tableLayout = value as
+              | "vertical"
+              | "horizontal";
+            await this.plugin.saveSettings();
+          }),
+      );
 
     new Setting(containerEl)
-      .setName('Table Theme')
-      .setDesc('Select color theme for rendered tables')
-      .addDropdown(dropdown => dropdown
-        .addOption('dark', 'Dark Contrast')
-        .addOption('light', 'Light Clean')
-        .addOption('blue', 'Modern Blue')
-        .addOption('purple', 'Purple Accent')
-        .addOption('mono', 'Mono')
-        .addOption('sepia', 'Sepia')
-        .addOption('nord', 'Nord')
-        .addOption('dracula', 'Dracula')
-        .addOption('cyberpunk', 'Cyberpunk')
-        .addOption('midnight', 'Midnight')
-        .addOption('slate', 'Slate')
-        .addOption('teal', 'Teal')
-        .addOption('amber', 'Amber')
-        .setValue(this.plugin.settings.themeStyle)
-        .onChange(async (value) => {
-          this.plugin.settings.themeStyle = value as any;
-          await this.plugin.saveSettings();
-        }));
+      .setName("Table Theme")
+      .setDesc("Select color theme for rendered tables")
+      .addDropdown((dropdown) =>
+        dropdown
+          .addOption("dark", "Dark Contrast")
+          .addOption("light", "Light Clean")
+          .addOption("blue", "Modern Blue")
+          .addOption("purple", "Purple Accent")
+          .addOption("mono", "Mono")
+          .addOption("sepia", "Sepia")
+          .addOption("nord", "Nord")
+          .addOption("dracula", "Dracula")
+          .addOption("cyberpunk", "Cyberpunk")
+          .addOption("midnight", "Midnight")
+          .addOption("slate", "Slate")
+          .addOption("teal", "Teal")
+          .addOption("amber", "Amber")
+          .setValue(this.plugin.settings.themeStyle)
+          .onChange(async (value) => {
+            this.plugin.settings.themeStyle = value as any;
+            await this.plugin.saveSettings();
+          }),
+      );
 
     new Setting(containerEl)
-      .setName('Refresh Interval')
-      .setDesc('Select how often data tables automatically update in the background.')
-      .addDropdown(dropdown => dropdown
-        .addOption('0', 'Realtime (On view / render)')
-        .addOption('60000', '1 Minute (Default)')
-        .addOption('300000', '5 Minutes')
-        .addOption('1800000', '30 Minutes')
-        .addOption('3600000', '1 Hour')
-        .setValue(String(this.plugin.settings.refreshInterval))
-        .onChange(async (value) => {
-          this.plugin.settings.refreshInterval = Number(value);
-          await this.plugin.saveSettings();
-        }));
+      .setName("Refresh Interval")
+      .setDesc(
+        "Select how often data tables automatically update in the background.",
+      )
+      .addDropdown((dropdown) =>
+        dropdown
+          .addOption("0", "Realtime (On view / render)")
+          .addOption("60000", "1 Minute (Default)")
+          .addOption("300000", "5 Minutes")
+          .addOption("1800000", "30 Minutes")
+          .addOption("3600000", "1 Hour")
+          .setValue(String(this.plugin.settings.refreshInterval))
+          .onChange(async (value) => {
+            this.plugin.settings.refreshInterval = Number(value);
+            await this.plugin.saveSettings();
+          }),
+      );
 
     const testSetting = new Setting(containerEl)
-      .setName('Test Connection')
-      .setDesc('Verify instance URL reachability and API Token validity.');
+      .setName("Test Connection")
+      .setDesc("Verify instance URL reachability and API Token validity.");
 
-    const statusContainer = containerEl.createDiv({ cls: 'forgejo-test-status', attr: { style: 'margin-top: 8px;' } });
-
-    testSetting.addButton(button => button
-      .setButtonText('Test Connection')
-      .setCta()
-      .onClick(async () => {
-        statusContainer.empty();
-        statusContainer.createEl('span', { text: '🔄 Testing connection...' });
-
-        try {
-          const user = await this.plugin.fetchApi<ForgejoUser>('user');
-          statusContainer.empty();
-          statusContainer.createEl('div', { 
-            text: `✅ Connection successful! Authenticated as: ${user.login} (${user.full_name || 'No full name'})`,
-            attr: { style: 'color: var(--text-success); font-weight: bold;' }
-          });
-          new Notice('Forgejo connection successful!');
-        } catch (err) {
-          statusContainer.empty();
-          statusContainer.createEl('div', { 
-            text: `❌ Connection failed: ${err instanceof Error ? err.message : String(err)}`,
-            attr: { style: 'color: var(--text-error); font-weight: bold;' }
-          });
-          new Notice('Forgejo connection failed.');
-        }
-      }));
-
-    containerEl.createEl('hr', { attr: { style: 'margin: 20px 0;' } });
-    const supportContainer = containerEl.createDiv({ attr: { style: 'text-align: center;' } });
-    supportContainer.createEl('p', { text: 'If you like this plugin, consider supporting its development:' });
-    
-    const paypalLink = supportContainer.createEl('a', { 
-      href: 'https://www.paypal.com/donate/?hosted_button_id=PWY939TPCQ3RA', 
-      attr: { target: '_blank', rel: 'noopener' } 
+    const statusContainer = containerEl.createDiv({
+      cls: "forgejo-test-status",
+      attr: { style: "margin-top: 8px;" },
     });
-    
-    paypalLink.createEl('img', {
+
+    testSetting.addButton((button) =>
+      button
+        .setButtonText("Test Connection")
+        .setCta()
+        .onClick(async () => {
+          statusContainer.empty();
+          statusContainer.createEl("span", {
+            text: "🔄 Testing connection...",
+          });
+
+          try {
+            const user = await this.plugin.fetchApi<ForgejoUser>("user");
+            statusContainer.empty();
+            statusContainer.createEl("div", {
+              text: `✅ Connection successful! Authenticated as: ${user.login} (${user.full_name || "No full name"})`,
+              attr: { style: "color: var(--text-success); font-weight: bold;" },
+            });
+            new Notice("Forgejo connection successful!");
+          } catch (err) {
+            statusContainer.empty();
+            statusContainer.createEl("div", {
+              text: `❌ Connection failed: ${err instanceof Error ? err.message : String(err)}`,
+              attr: { style: "color: var(--text-error); font-weight: bold;" },
+            });
+            new Notice("Forgejo connection failed.");
+          }
+        }),
+    );
+
+    containerEl.createEl("hr", { attr: { style: "margin: 20px 0;" } });
+
+    const supportContainer = containerEl.createDiv({
       attr: {
-        src: 'https://img.shields.io/badge/Donate-PayPal-00457C?style=for-the-badge&logo=paypal&logoColor=white',
-        alt: 'Donate via PayPal'
-      }
+        style:
+          "text-align: center; display: flex; flex-direction: column; align-items: center;",
+      },
+    });
+
+    supportContainer.createEl("p", {
+      text: "If you like this plugin, consider supporting its development:",
+    });
+
+    // Wrapper für die Links mit Flexbox & Abständen (gap)
+    const badgeContainer = supportContainer.createDiv({
+      attr: {
+        style:
+          "display: flex; gap: 12px; justify-content: center; align-items: center; flex-wrap: wrap;",
+      },
+    });
+
+    const paypalLink = badgeContainer.createEl("a", {
+      href: "https://www.paypal.com/donate/?hosted_button_id=PWY939TPCQ3RA",
+      attr: { target: "_blank", rel: "noopener" },
+    });
+
+    const bymeacoffeeLink = badgeContainer.createEl("a", {
+      href: "https://www.buymeacoffee.com/RonDev",
+      attr: { target: "_blank", rel: "noopener" },
+    });
+
+    const kofiLink = badgeContainer.createEl("a", {
+      href: "https://ko-fi.com/U6U31EV2VS",
+      attr: { target: "_blank", rel: "noopener" },
+    });
+
+    paypalLink.createEl("img", {
+      attr: {
+        src: "https://mini-badges.rondev.de/icon/paypal/PayPal/for-the-badge",
+        alt: "Donate via PayPal",
+      },
+    });
+
+    bymeacoffeeLink.createEl("img", {
+      attr: {
+        src: "https://mini-badges.rondev.de/icon/cuptogo/Buy_me_a_Coffee-c1d82f-222/for-the-badge",
+        alt: "Buy me a Coffee",
+      },
+    });
+
+    kofiLink.createEl("img", {
+      attr: {
+        src: "https://mini-badges.rondev.de/icon/cuptogo/ko--fi.com-c1d82f-222/for-the-badge",
+        alt: "Ko-fi",
+      },
     });
   }
 }
