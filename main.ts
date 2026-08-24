@@ -5,7 +5,7 @@ interface ForgejoSettings {
   apiToken: string;
   tableLayout: 'vertical' | 'horizontal';
   refreshInterval: number;
-  themeStyle: 'dark' | 'light' | 'blue' | 'purple';
+  themeStyle: 'dark' | 'light' | 'blue' | 'purple' | 'mono' | 'sepia' | 'nord' | 'dracula' | 'cyberpunk' | 'midnight' | 'slate' | 'teal' | 'amber';
   useSvgIcons: boolean;
   enableCache: boolean;
 }
@@ -163,41 +163,122 @@ export default class ForgejoPlugin extends Plugin {
     let rowTextColor = 'var(--text-normal)';
 
     switch (this.settings.themeStyle) {
-      case 'dark':
-        headerBg = '#1e1e2e';
-        subHeaderBg = '#2d2d3d';
-        textHeader = '#cdd6f4';
-        borderCol = '#45475a';
-        rowBgPrimary = '#1e1e2e';
-        zebraBg = '#181825';
-        rowTextColor = '#cdd6f4';
+      case "dark":
+        headerBg = "#1e1e2e";
+        subHeaderBg = "#2d2d3d";
+        textHeader = "#cdd6f4";
+        borderCol = "#45475a";
+        rowBgPrimary = "#1e1e2e";
+        zebraBg = "#181825";
+        rowTextColor = "#cdd6f4";
         break;
-      case 'light':
-        headerBg = '#e6e9ef';
-        subHeaderBg = '#dce0e8';
-        textHeader = '#4c4f69';
-        borderCol = '#bcc0cc';
-        rowBgPrimary = '#ffffff';
-        zebraBg = '#f2f4f8';
-        rowTextColor = '#4c4f69';
+      case "light":
+        headerBg = "#e6e9ef";
+        subHeaderBg = "#dce0e8";
+        textHeader = "#4c4f69";
+        borderCol = "#bcc0cc";
+        rowBgPrimary = "#ffffff";
+        zebraBg = "#f2f4f8";
+        rowTextColor = "#4c4f69";
         break;
-      case 'blue':
-        headerBg = '#1e3a8a';
-        subHeaderBg = '#1d4ed8';
-        textHeader = '#ffffff';
-        borderCol = '#3b82f6';
-        rowBgPrimary = '#ffffff';
-        zebraBg = '#eff6ff';
-        rowTextColor = '#1e293b';
+      case "blue":
+        headerBg = "#1e3a8a";
+        subHeaderBg = "#1d4ed8";
+        textHeader = "#ffffff";
+        borderCol = "#3b82f6";
+        rowBgPrimary = "#ffffff";
+        zebraBg = "#eff6ff";
+        rowTextColor = "#1e293b";
         break;
-      case 'purple':
-        headerBg = '#581c87';
-        subHeaderBg = '#7e22ce';
-        textHeader = '#ffffff';
-        borderCol = '#a855f7';
-        rowBgPrimary = '#ffffff';
-        zebraBg = '#faf5ff';
-        rowTextColor = '#2e1065';
+      case "purple":
+        headerBg = "#581c87";
+        subHeaderBg = "#7e22ce";
+        textHeader = "#ffffff";
+        borderCol = "#a855f7";
+        rowBgPrimary = "#ffffff";
+        zebraBg = "#faf5ff";
+        rowTextColor = "#2e1065";
+        break;
+      case "mono":
+        headerBg = "#18181b";
+        subHeaderBg = "#27272a";
+        textHeader = "#ffffff";
+        borderCol = "#71717a";
+        rowBgPrimary = "#ffffff";
+        zebraBg = "#f4f4f5";
+        rowTextColor = "#18181b";
+        break;
+      case "sepia":
+        headerBg = "#78350f";
+        subHeaderBg = "#92400e";
+        textHeader = "#fff7ed";
+        borderCol = "#d97706";
+        rowBgPrimary = "#fffbeb";
+        zebraBg = "#fef3c7";
+        rowTextColor = "#451a03";
+        break;
+      case "nord":
+        headerBg = "#2e3440";
+        subHeaderBg = "#3b4252";
+        textHeader = "#eceff4";
+        borderCol = "#4c566a";
+        rowBgPrimary = "#eceff4";
+        zebraBg = "#e5e9f0";
+        rowTextColor = "#2e3440";
+        break;
+      case "dracula":
+        headerBg = "#282a36";
+        subHeaderBg = "#44475a";
+        textHeader = "#f8f8f2";
+        borderCol = "#6272a4";
+        rowBgPrimary = "#282a36";
+        zebraBg = "#21222c";
+        rowTextColor = "#f8f8f2";
+        break;
+      case "cyberpunk":
+        headerBg = "#18181b";
+        subHeaderBg = "#27272a";
+        textHeader = "#f0abfc";
+        borderCol = "#d946ef";
+        rowBgPrimary = "#09090b";
+        zebraBg = "#18181b";
+        rowTextColor = "#e879f9";
+        break;
+      case "midnight":
+        headerBg = "#0f172a";
+        subHeaderBg = "#1e293b";
+        textHeader = "#e2e8f0";
+        borderCol = "#334155";
+        rowBgPrimary = "#111827";
+        zebraBg = "#0f172a";
+        rowTextColor = "#e2e8f0";
+        break;
+      case "slate":
+        headerBg = "#1e293b";
+        subHeaderBg = "#334155";
+        textHeader = "#f8fafc";
+        borderCol = "#64748b";
+        rowBgPrimary = "#ffffff";
+        zebraBg = "#f8fafc";
+        rowTextColor = "#1e293b";
+        break;
+      case "teal":
+        headerBg = "#134e4a";
+        subHeaderBg = "#0f766e";
+        textHeader = "#ffffff";
+        borderCol = "#14b8a6";
+        rowBgPrimary = "#ffffff";
+        zebraBg = "#f0fdfa";
+        rowTextColor = "#134e4a";
+        break;
+      case "amber":
+        headerBg = "#92400e";
+        subHeaderBg = "#b45309";
+        textHeader = "#ffffff";
+        borderCol = "#f59e0b";
+        rowBgPrimary = "#ffffff";
+        zebraBg = "#fffbeb";
+        rowTextColor = "#451a03";
         break;
     }
 
@@ -889,6 +970,15 @@ class ForgejoSettingTab extends PluginSettingTab {
         .addOption('light', 'Light Clean')
         .addOption('blue', 'Modern Blue')
         .addOption('purple', 'Purple Accent')
+        .addOption('mono', 'Mono')
+        .addOption('sepia', 'Sepia')
+        .addOption('nord', 'Nord')
+        .addOption('dracula', 'Dracula')
+        .addOption('cyberpunk', 'Cyberpunk')
+        .addOption('midnight', 'Midnight')
+        .addOption('slate', 'Slate')
+        .addOption('teal', 'Teal')
+        .addOption('amber', 'Amber')
         .setValue(this.plugin.settings.themeStyle)
         .onChange(async (value) => {
           this.plugin.settings.themeStyle = value as any;
