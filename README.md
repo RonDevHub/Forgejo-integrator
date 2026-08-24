@@ -1,51 +1,56 @@
-# Obsidian Forgejo Integrator
+# Obsidian Forgejo Plugin
 
-A lightweight Obsidian plugin to embed and visualize Forgejo Issues and Pull Requests as clean, styled tables directly inside your notes.
+Seamlessly integrate and render live data from your **Forgejo** (or Gitea) instance directly inside your **Obsidian** notes using custom Markdown code blocks.
 
-[![Donate via PayPal](https://img.shields.io/badge/Donate-PayPal-00457C?style=for-the-badge&logo=paypal&logoColor=white)](https://www.paypal.com/donate/?hosted_button_id=PWY939TPCQ3RA)
+Track single issues, pull requests, repository overviews, and filtered lists in real-time with customizable themes and sortable tables.
 
-## Features
+---
 
-- **Issue Visualizer (`FIS`)**: Embed detailed summaries of Forgejo Issues.
-- **Pull Request Visualizer (`FPR`)**: Embed detailed summaries of Forgejo Pull Requests.
-- **Flexible Layouts**: Choose between vertical (Key-Value) and horizontal (Column) table layouts.
-- **Secure Configuration**: Password-masked API Token input and built-in connection test.
-- **Cross-Platform**: Uses Obsidian's native `requestUrl` to prevent CORS issues on Desktop and Mobile.
+## 🌟 Key Features
 
-## Usage
+- **Live Data Fetching**: Pulls real-time information directly from your self-hosted Forgejo/Gitea REST API.
+- **Interactive & Sortable Tables**: Sort lists dynamically by clicking on column headers (supports numeric, date, and alphabetical sorting).
+- **Multiple Markdown Code Blocks**: Embed individual items, repository lists, user-specific pull requests, or complete account overviews.
+- **Customizable Themes & Layouts**: Choose between 13 color themes (`dark`, `light`, `blue`, `purple`, `mono`, `sepia`, `nord`, `dracula`, `cyberpunk`, `midnight`, `slate`, `teal`, `amber`) and vertical/horizontal single-item views.
+- **Client-side Caching & Polling**: Reduce server load and API limits with built-in caching and configurable auto-refresh intervals.
+- **Security First**: Input sanitization against XSS and token obfuscation in plugin settings.
 
-Simply paste the Forgejo Issue or PR URL inside a Markdown codeblock:
+---
 
-### Issue Codeblock (`FIS`)
+## 🚀 Installation
 
+### Manual Installation
+1. Download `main.js`, `manifest.json`, and `styles.css` from the latest release.
+2. Create a folder named `obsidian-forgejo-plugin` inside your vault's plugin folder (`<vault>/.obsidian/plugins/`).
+3. Copy the downloaded files into `<vault>/.obsidian/plugins/obsidian-forgejo-plugin/`.
+4. Open Obsidian, go to **Settings > Community Plugins**, and enable **Forgejo Integrator**.
+
+---
+
+## ⚙️ Configuration
+
+Navigate to **Settings > Forgejo Integrator** to configure the plugin:
+
+1. **Forgejo Server URL**: Base URL of your Forgejo instance (e.g., `https://forgejo.yourdomain.com`).
+2. **API Token**: A Personal Access Token with **Read** access to your repositories and user profile.
+3. **Table Theme**: Select a theme (`dark`, `light`, `blue`, `purple`, `mono`, `sepia`, `nord`, `dracula`, `cyberpunk`, `midnight`, `slate`, `teal`, `amber`).
+4. **Table Layout**: Toggle between `vertical` and `horizontal` presentation for single-item blocks.
+5. **Enable Caching**: Toggle local disk/memory caching to minimize network requests.
+6. **Refresh Interval**: Set auto-update frequency (Realtime, 1 min, 5 min, 30 min, 1 hr).
+7. **Test Connection**: Click the **Test Connection** button to verify your API credentials.
+
+---
+
+## 📝 Usage & Code Block Examples
+
+Simply paste any of the following code blocks into your Obsidian notes:
+
+### 1. Single Issues & Pull Requests
+
+Render detailed information about a specific issue or pull request.
+
+````markdown
 ```FIS
-https://commitcloud.net/RonDevHub/devwebsite/issues/4
+https://forgejo.yourdomain.com/owner/repo/issues/42
 ```
-
-### Pull Request Codeblock (`FPR`)
-
-<code>
-```
-FPR https://my-forgejo-instance.com/RonDevHub/Forgejo-integrator/pulls/1
-```
-</code>
-
-
-## Settings
-
-1. Go to **Obsidian Settings** -> **Forgejo Integrator**.
-2. Enter your **Forgejo Server URL** (e.g., `https://commitcloud.net`).
-3. Provide your **API Token** (Read-only access to repositories is sufficient).
-4. Select your preferred **Table Layout** (Vertical or Horizontal).
-5. Click **Test Connection** to verify your setup.
-
-## Build from Source
-
-```bash
-npm install
-npm run build
-```
-
-## License
-
-MIT
+````
