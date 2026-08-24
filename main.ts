@@ -72,16 +72,42 @@ interface ForgejoRepo {
   open_issues_count: number;
 }
 
-const SVG_LOCK = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 560" class="forgejo-icon"><path fill="currentColor" d="M258.8 380c-3.9 3.1-6.7 7.6-6.7 12.6l0 27.4c0 15.5-12.5 28-28 28s-28-12.5-28-28l0-27.4c0-5-2.8-9.5-6.7-12.6-13-10.3-21.3-26.1-21.3-44 0-30.9 25.1-56 56-56s56 25.1 56 56c0 17.8-8.3 33.7-21.3 44zM84.2 140l0 40.9c-16.9 5.9-31.9 14.4-44.3 26.8-17.3 17.3-27 39.5-32.5 65.1-9.8 45.4-9.8 137 0 182.4 5.5 25.6 15.2 47.8 32.5 65.1s39.5 27 65.1 32.5c25.3 5.5 55.7 7.2 91.2 7.2l56 0c35.6 0 65.9-1.7 91.2-7.2 25.6-5.5 47.8-15.2 65.1-32.5s27-39.5 32.5-65.1c9.8-45.4 9.8-137 0-182.4-5.5-25.6-15.2-47.8-32.5-65.1-12.4-12.4-27.4-20.9-44.3-26.8l0-40.9c0-40.3-12.9-75.9-38.5-101.5S264.4 0 224.2 0 148.3 12.9 122.7 38.5 84.2 99.7 84.2 140zm78.1-61.9C175.6 64.8 196 56 224.2 56s48.6 8.8 61.9 22.1 22.1 33.7 22.1 61.9l0 30.1c-17-1.5-35.6-2.1-56-2.1l-56 0c-20.4 0-39 .6-56 2.1l0-30.1c0-28.2 8.8-48.6 22.1-61.9zM62.1 284.6c4.1-19 10.1-30.1 17.4-37.3s18.3-13.3 37.3-17.4c19.3-4.2 45-5.9 79.4-5.9l56 0c34.4 0 60.1 1.8 79.4 5.9 19 4.1 30.1 10.1 37.3 17.4s13.3 18.3 17.4 37.3c4.2 19.3 5.9 45 5.9 79.4s-1.8 60.1-5.9 79.4c-4.1 19-10.1 30.1-17.4 37.3s-18.3 13.3-37.3 17.4c-19.3 4.2-45 5.9-79.4 5.9l-56 0c-34.4 0-60.1-1.8-79.4-5.9-19-4.1-30.1-10.1-37.3-17.4s-13.3-18.3-17.4-37.3c-4.2-19.3-5.9-45-5.9-79.4s1.8-60.1 5.9-79.4z"/></svg>`;
+const SVG_LOCK = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 560" class="forgejo-icon"><path fill="currentColor" d="M258.8 380c-3.9 3.1-6.7 7.6-6.7 12.6l0 27.4c0 15.5-12.5 28-28 28s-28-12.5-28-28l0-27.4c0-5-2.8-9.5-6.7-12.6-13-10.3-21.3-26.1-21.3-44 0-30.9 25.1-56 56-56s56 25.1 56 56c0 17.8-8.3 33.7-21.3 44zM84.2 140l0 40.9c-16.9 5.9-31.9 14.4-44.3 26.8-17.3 17.3-27 39.5-32.5 65.1-9.8 45.4-9.8 137 0 182.4 5.5 25.6 15.2 47.8 32.5 65.1s39.5 27 65.1 32.5c25.3 5.5 55.7 7.2 91.2 7.2l56 0c35.6 0 65.9-1.7 91.2-7.2 25.6-5.5 47.8-15.2 65.1-32.5s27-39.5 32.5-65.1c9.8-45.4 9.8-137 0-182.4-5.5-25.6-15.2-47.8-32.5-65.1-12.4-12.4-27.4-20.9-44.3-26.8l0-40.9c0-40.3-12.9-75.9-38.5-101.5S264.4 0 224.2 0 148.3 12.9 122.7 38.5 84.2 99.7 84.2 140zm78.1-61.9C175.6 64.8 196 56 224.2 56s48.6 8.8 61.9 22.1 22.1 33.7 22.1 61.9l0 30.1c-17-1.5-35.6-2.1-56-2.1l-56 0c-20.4 0-39 .6-56 2.1l0-30.1c0-28.2 8.8-48.6 22.1-61.9zM62.1 284.6c4.1-19 10.1-30.1 17.4-37.3s18.3-13.3 37.3-17.4c19.3-4.2 45-5.9 79.4-5.9l56 0c34.4 0 60.1 1.8 79.4 5.9 19 4.1 30.1 10.1 37.3 17.4s13.3 18.3 17.4 37.3c4.2 19.3 5.9 45 5.9 79.4s-1.8 60.1-5.9 79.4c-4.1 19-10.1 30.1-17.4 37.3s-18.3 13.3-37.3 17.4c-19.3-4.2-45-5.9-79.4-5.9l-56 0c-34.4 0-60.1-1.8-79.4-5.9-19-4.1-30.1-10.1-37.3-17.4s-13.3-18.3-17.4-37.3c-4.2-19.3-5.9-45-5.9-79.4s1.8-60.1 5.9-79.4z"/></svg>`;
 const SVG_GLOBE = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 560" class="forgejo-icon"><path fill="currentColor" d="M69.6 192.2c21.5-63.1 68.3-108.2 136.1-126.8-37.3 60.9-51.5 136.6-52.2 209.2-25.5-2.4-46.3-5.3-62.9-8.2-17.6-3.1-35.5-6.2-52.3-12.5-14.3-5.6-30.5 1.3-36.2 15.7-5.7 14.4 1.2 30.7 15.6 36.4 20.3 8 42 11.9 63.4 15.6 19.7 3.4 44.5 6.8 74.8 9.5 5.3 57.9 20.4 115.4 49.9 163.6-64.8-17.7-110.4-59.7-133-118.2-5.6-14.4-21.8-21.6-36.2-16s-21.6 21.8-16 36.2C60.5 500.2 155.6 560 280 560s219.6-59.8 259.6-163.5c5.6-14.4-1.6-30.6-16-36.2s-30.6 1.6-36.2 16c-22.6 58.6-68.1 100.5-133 118.2 29.5-48.2 44.6-105.7 49.9-163.6 30.3-2.6 55-6 74.8-9.5 21.4-3.7 43.1-7.5 63.4-15.6 14.4-5.7 21.3-22 15.6-36.4-5.7-14.3-21.9-21.3-36.2-15.7-16.8 6.3-34.7 9.4-52.3 12.5-16.6 2.9-37.4 5.8-62.9 8.2-.7-72.7-14.8-148.3-52.2-209.2 67.8 18.5 114.6 63.6 136.1 126.8 5 14.6 20.9 22.5 35.5 17.5s22.5-20.9 17.5-35.5C506.1 64.2 408.8 0 280 0S53.9 64.2 16.5 174.1c-5 14.6 2.9 30.5 17.5 35.5s30.5-2.9 35.5-17.5zM212.4 334.6c20.7 .9 43.2 1.4 67.6 1.4s47-.5 67.6-1.4c-7.3 65.5-28.7 124.4-67.6 165.1-38.9-40.7-60.4-99.6-67.6-165.1zM280 60.3c49.2 51.5 70.3 131.9 70.6 218.2-21.3 1-44.7 1.5-70.6 1.5s-49.3-.6-70.6-1.5c.2-86.3 21.3-166.7 70.6-218.2z"/></svg>`;
 
-// SVGs for sorting
 const SVG_SORT_ASC = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 616 560" class="forgejo-sort-icon"><path fill="currentColor" d="M309.6 216.7c0-9.5-2.2-19.6-7.6-28.8-12.4-21.5-55.1-89.5-123.4-126-7.7-4.1-15.9-5.9-23.8-5.9s-16.1 1.8-23.8 5.9c-68.3 36.5-111 104.5-123.4 126-5.3 9.3-7.6 19.3-7.6 28.8 0 23.5 14.5 48.1 42.2 54 17.3 3.7 44.4 7.6 84.6 8.8l0 196.4c0 15.5 12.5 28 28 28s28-12.5 28-28l0-196.4c40.3-1.3 67.3-5.1 84.6-8.8 27.7-5.9 42.2-30.6 42.2-54zm-154.8-104c52.3 29.1 87.5 84.2 98.8 103.7-16.9 3.4-47.9 7.6-98.8 7.6S73 219.9 56 216.4c11.3-19.5 46.5-74.6 98.8-103.7zM364 84c-15.5 0-28 12.5-28 28s12.5 28 28 28l224 0c15.5 0 28-12.5 28-28s-12.5-28-28-28L364 84zM336 448c0-15.5 12.5-28 28-28l112 0c15.5 0 28 12.5 28 28s-12.5 28-28 28l-112 0c-15.5 0-28-12.5-28-28zm28-196c-15.5 0-28 12.5-28 28s12.5 28 28 28l168 0c15.5 0 28-12.5 28-28s-12.5-28-28-28l-168 0z"/></svg>`;
-const SVG_SORT_DESC = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 616 560" class="forgejo-sort-icon"><path fill="currentColor" d="M309.6 343.3c0 9.5-2.2 19.6-7.6 28.8-12.4 21.5-55.1 89.5-123.4 126-7.7 4.1-15.9 5.9-23.8 5.9s-16.1-1.8-23.8-5.9c-68.3-36.5-111-104.5-123.4-126-5.3-9.3-7.6-19.3-7.6-28.8 0-23.5 14.5-48.1 42.2-54 17.3-3.7 44.4-7.6 84.6-8.8l0-196.4c0-15.5 12.5-28 28-28s28 12.5 28 28l0 196.4c40.3 1.3 67.3 5.1 84.6 8.8 27.7 5.9 42.2 30.6 42.2 54zm-154.8 104c52.3-29.1 87.5-84.2 98.8-103.7-16.9-3.4-47.9-7.6-98.8-7.6S73 340.1 56 343.6c11.3 19.5 46.5 74.6 98.8 103.7zM364 84c-15.5 0-28 12.5-28 28s12.5 28 28 28l224 0c15.5 0 28-12.5 28-28s-12.5-28-28-28L364 84zM336 448c0-15.5 12.5-28 28-28l112 0c15.5 0 28 12.5 28 28s-12.5 28-28 28l-112 0c-15.5 0-28-12.5-28-28zm28-196c-15.5 0-28 12.5-28 28s12.5 28 28 28l168 0c15.5 0 28-12.5 28-28s-12.5-28-28-28l-168 0z"/></svg>`;
+const SVG_SORT_DESC = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 616 560" class="forgejo-sort-icon"><path fill="currentColor" d="M309.6 343.3c0 9.5-2.2 19.6-7.6 28.8-12.4 21.5-55.1 89.5-123.4 126-7.7 4.1-15.9 5.9-23.8 5.9s-16.1-1.8-23.8-5.9c-68.3-36.5-111-104.5-123.4-126-5.3-9.3-7.6-19.3-7.6-28.8 0-23.5 14.5-48.1 42.2-54 17.3-3.7 44.4-7.6 84.6-8.8l0-196.4c0-15.5 12.5-28 28-28s28 12.5 28 28l0 196.4c40.3 1.3 67.3 5.1 84.6 8.8 27.7 5.9 42.2 30.6 42.2 54zm-154.8 104c52.3-29.1 87.5-84.2 98.8-103.7-16.9-3.4-47.9-7.6-98.8-7.6S73 340.1 56 343.6c11.3 19.5 46.5 74.6 98.8 103.7zM364 84c-15.5 0-28 12.5-28 28s12.5 28 28 28l224 0c15.5 0 28-12.5 28-28s-12.5-28-28-28L364 84zM336 448c0-15.5 12.5-28 28-28l112 0c15.5 0 28-12.5 28-28s-12.5 28-28 28l-112 0c-15.5 0-28-12.5-28-28zm28-196c-15.5 0-28 12.5-28 28s12.5 28 28 28l168 0c15.5 0 28-12.5 28-28s-12.5-28-28-28l-168 0z"/></svg>`;
 
-// SVGs for Open / Closed Label
 const SVG_OPEN_LABEL = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 672 560" class="forgejo-icon"><path fill="currentColor" d="M370.7 380c-3.9 3.1-6.7 7.6-6.7 12.6l0 27.4c0 15.5-12.5 28-28 28s-28-12.5-28-28l0-27.4c0-5-2.8-9.5-6.7-12.6-13-10.3-21.3-26.1-21.3-44 0-30.9 25.1-56 56-56s56 25.1 56 56c0 17.8-8.3 33.7-21.3 44zM470.1 78.1C456.8 91.4 448 111.8 448 140l0 33.8c26.6 4.8 52.9 14.5 72.3 33.9 17.3 17.3 27 39.5 32.5 65.1 9.8 45.4 9.8 137 0 182.4-5.5 25.6-15.2 47.8-32.5 65.1s-39.5 27-65.1 32.5c-25.3 5.5-55.7 7.2-91.2 7.2l-56 0c-35.6 0-65.9-1.7-91.2-7.2-25.6-5.5-47.8-15.2-65.1-32.5s-27-39.5-32.5-65.1c-9.8-45.4-9.8-137 0-182.4 5.5-25.6 15.2-47.8 32.5-65.1s39.5-27 65.1-32.5c25.3-5.5 55.7-7.2 91.2-7.2l56 0c9.7 0 19.1 .1 28 .4l0-28.4c0-40.3 12.9-75.9 38.5-101.5S491.7 0 532 0 607.9 12.9 633.5 38.5 672 99.7 672 140l0 56c0 15.5-12.5 28-28 28s-28-12.5-28-28l0-56c0-28.2-8.8-48.6-22.1-61.9S560.2 56 532 56 483.4 64.8 470.1 78.1zM173.9 284.6c-4.2 19.3-5.9 45-5.9 79.4s1.8 60.1 5.9 79.4c4.1 19 10.1 30.1 17.4 37.3s18.3 13.3 37.3 17.4c19.3 4.2 45 5.9 79.4 5.9l56 0c34.4 0 60.1-1.8 79.4-5.9 19-4.1 30.1-10.1 37.3-17.4s13.3-18.3 17.4-37.3c4.2-19.3 5.9-45 5.9-79.4s-1.8-60.1-5.9-79.4c-4.1-19-10.1-30.1-17.4-37.3s-18.3-13.3-37.3-17.4c-19.3-4.2-45-5.9-79.4-5.9l-56 0c-34.4 0-60.1 1.8-79.4 5.9-19 4.1-30.1 10.1-37.3 17.4s-13.3 18.3-17.4 37.3z"/></svg>`;
-const SVG_CLOSED_LABEL = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 560" class="forgejo-icon"><path fill="currentColor" d="M258.8 380c-3.9 3.1-6.7 7.6-6.7 12.6l0 27.4c0 15.5-12.5 28-28 28s-28-12.5-28-28l0-27.4c0-5-2.8-9.5-6.7-12.6-13-10.3-21.3-26.1-21.3-44 0-30.9 25.1-56 56-56s56 25.1 56 56c0 17.8-8.3 33.7-21.3 44zM84.2 140l0 40.9c-16.9 5.9-31.9 14.4-44.3 26.8-17.3 17.3-27 39.5-32.5 65.1-9.8 45.4-9.8 137 0 182.4 5.5 25.6 15.2 47.8 32.5 65.1s39.5 27 65.1 32.5c25.3 5.5 55.7 7.2 91.2 7.2l56 0c35.6 0 65.9-1.7 91.2-7.2 25.6-5.5 47.8-15.2 65.1-32.5s27-39.5 32.5-65.1c9.8-45.4 9.8-137 0-182.4-5.5-25.6-15.2-47.8-32.5-65.1-12.4-12.4-27.4-20.9-44.3-26.8l0-40.9c0-40.3-12.9-75.9-38.5-101.5S264.4 0 224.2 0 148.3 12.9 122.7 38.5 84.2 99.7 84.2 140zm78.1-61.9C175.6 64.8 196 56 224.2 56s48.6 8.8 61.9 22.1 22.1 33.7 22.1 61.9l0 30.1c-17-1.5-35.6-2.1-56-2.1l-56 0c-20.4 0-39 .6-56 2.1l0-30.1c0-28.2 8.8-48.6 22.1-61.9zM62.1 284.6c4.1-19 10.1-30.1 17.4-37.3s18.3-13.3 37.3-17.4c19.3-4.2 45-5.9 79.4-5.9l56 0c34.4 0 60.1 1.8 79.4 5.9 19 4.1 30.1 10.1 37.3 17.4s13.3 18.3 17.4 37.3c4.2 19.3 5.9 45 5.9 79.4s-1.8 60.1-5.9 79.4c-4.1 19-10.1 30.1-17.4 37.3s-18.3 13.3-37.3 17.4c-19.3 4.2-45 5.9-79.4 5.9l-56 0c-34.4 0-60.1-1.8-79.4-5.9-19-4.1-30.1-10.1-37.3-17.4s-13.3-18.3-17.4-37.3c-4.2-19.3-5.9-45-5.9-79.4s1.8-60.1 5.9-79.4z"/></svg>`;
+const SVG_CLOSED_LABEL = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 560" class="forgejo-icon"><path fill="currentColor" d="M258.8 380c-3.9 3.1-6.7 7.6-6.7 12.6l0 27.4c0 15.5-12.5 28-28 28s-28-12.5-28-28l0-27.4c0-5-2.8-9.5-6.7-12.6-13-10.3-21.3-26.1-21.3-44 0-30.9 25.1-56 56-56s56 25.1 56 56c0 17.8-8.3 33.7-21.3 44zM84.2 140l0 40.9c-16.9 5.9-31.9 14.4-44.3 26.8-17.3 17.3-27 39.5-32.5 65.1-9.8 45.4-9.8 137 0 182.4 5.5 25.6 15.2 47.8 32.5 65.1s39.5 27 65.1 32.5c25.3 5.5 55.7 7.2 91.2 7.2l56 0c35.6 0 65.9-1.7 91.2-7.2 25.6-5.5 47.8-15.2 65.1-32.5s27-39.5 32.5-65.1c9.8-45.4 9.8-137 0-182.4-5.5-25.6-15.2-47.8-32.5-65.1-12.4-12.4-27.4-20.9-44.3-26.8l0-40.9c0-40.3-12.9-75.9-38.5-101.5S264.4 0 224.2 0 148.3 12.9 122.7 38.5 84.2 99.7 84.2 140zm78.1-61.9C175.6 64.8 196 56 224.2 56s48.6 8.8 61.9 22.1 22.1 33.7 22.1 61.9l0 30.1c-17-1.5-35.6-2.1-56-2.1l-56 0c-20.4 0-39 .6-56 2.1l0-30.1c0-28.2 8.8-48.6 22.1-61.9zM62.1 284.6c4.1-19 10.1-30.1 17.4-37.3s18.3-13.3 37.3-17.4c19.3-4.2 45-5.9 79.4-5.9l56 0c34.4 0 60.1 1.8 79.4 5.9 19 4.1 30.1 10.1 37.3 17.4s13.3 18.3 17.4 37.3c4.2 19.3 5.9 45 5.9 79.4s-1.8 60.1-5.9 79.4c-4.1 19-10.1 30.1-17.4 37.3s-18.3 13.3-37.3 17.4c-19.3-4.2-45-5.9-79.4-5.9l-56 0c-34.4 0-60.1-1.8-79.4-5.9-19-4.1-30.1-10.1-37.3-17.4s-13.3-18.3-17.4-37.3c-4.2-19.3-5.9-45-5.9-79.4s1.8-60.1 5.9-79.4z"/></svg>`;
+
+// Helper function against XSS: Sanitize String inputs
+function escapeHtml(str: string): string {
+  if (!str) return '';
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+// Helper to validate safe URLs (preventing javascript: or arbitrary origins)
+function sanitizeUrl(rawUrl: string, expectedHostUrl?: string): string {
+  try {
+    const url = new URL(rawUrl);
+    if (url.protocol !== 'http:' && url.protocol !== 'https:') {
+      return '#';
+    }
+    if (expectedHostUrl) {
+      const expected = new URL(expectedHostUrl);
+      if (url.origin !== expected.origin) return '#';
+    }
+    return url.toString();
+  } catch {
+    return '#';
+  }
+}
 
 export default class ForgejoPlugin extends Plugin {
   settings: ForgejoSettings;
@@ -164,122 +190,31 @@ export default class ForgejoPlugin extends Plugin {
 
     switch (this.settings.themeStyle) {
       case "dark":
-        headerBg = "#1e1e2e";
-        subHeaderBg = "#2d2d3d";
-        textHeader = "#cdd6f4";
-        borderCol = "#45475a";
-        rowBgPrimary = "#1e1e2e";
-        zebraBg = "#181825";
-        rowTextColor = "#cdd6f4";
-        break;
+        headerBg = "#1e1e2e"; subHeaderBg = "#2d2d3d"; textHeader = "#cdd6f4"; borderCol = "#45475a"; rowBgPrimary = "#1e1e2e"; zebraBg = "#181825"; rowTextColor = "#cdd6f4"; break;
       case "light":
-        headerBg = "#e6e9ef";
-        subHeaderBg = "#dce0e8";
-        textHeader = "#4c4f69";
-        borderCol = "#bcc0cc";
-        rowBgPrimary = "#ffffff";
-        zebraBg = "#f2f4f8";
-        rowTextColor = "#4c4f69";
-        break;
+        headerBg = "#e6e9ef"; subHeaderBg = "#dce0e8"; textHeader = "#4c4f69"; borderCol = "#bcc0cc"; rowBgPrimary = "#ffffff"; zebraBg = "#f2f4f8"; rowTextColor = "#4c4f69"; break;
       case "blue":
-        headerBg = "#1e3a8a";
-        subHeaderBg = "#1d4ed8";
-        textHeader = "#ffffff";
-        borderCol = "#3b82f6";
-        rowBgPrimary = "#ffffff";
-        zebraBg = "#eff6ff";
-        rowTextColor = "#1e293b";
-        break;
+        headerBg = "#1e3a8a"; subHeaderBg = "#1d4ed8"; textHeader = "#ffffff"; borderCol = "#3b82f6"; rowBgPrimary = "#ffffff"; zebraBg = "#eff6ff"; rowTextColor = "#1e293b"; break;
       case "purple":
-        headerBg = "#581c87";
-        subHeaderBg = "#7e22ce";
-        textHeader = "#ffffff";
-        borderCol = "#a855f7";
-        rowBgPrimary = "#ffffff";
-        zebraBg = "#faf5ff";
-        rowTextColor = "#2e1065";
-        break;
+        headerBg = "#581c87"; subHeaderBg = "#7e22ce"; textHeader = "#ffffff"; borderCol = "#a855f7"; rowBgPrimary = "#ffffff"; zebraBg = "#faf5ff"; rowTextColor = "#2e1065"; break;
       case "mono":
-        headerBg = "#18181b";
-        subHeaderBg = "#27272a";
-        textHeader = "#ffffff";
-        borderCol = "#71717a";
-        rowBgPrimary = "#ffffff";
-        zebraBg = "#f4f4f5";
-        rowTextColor = "#18181b";
-        break;
+        headerBg = "#18181b"; subHeaderBg = "#27272a"; textHeader = "#ffffff"; borderCol = "#71717a"; rowBgPrimary = "#ffffff"; zebraBg = "#f4f4f5"; rowTextColor = "#18181b"; break;
       case "sepia":
-        headerBg = "#78350f";
-        subHeaderBg = "#92400e";
-        textHeader = "#fff7ed";
-        borderCol = "#d97706";
-        rowBgPrimary = "#fffbeb";
-        zebraBg = "#fef3c7";
-        rowTextColor = "#451a03";
-        break;
+        headerBg = "#78350f"; subHeaderBg = "#92400e"; textHeader = "#fff7ed"; borderCol = "#d97706"; rowBgPrimary = "#fffbeb"; zebraBg = "#fef3c7"; rowTextColor = "#451a03"; break;
       case "nord":
-        headerBg = "#2e3440";
-        subHeaderBg = "#3b4252";
-        textHeader = "#eceff4";
-        borderCol = "#4c566a";
-        rowBgPrimary = "#eceff4";
-        zebraBg = "#e5e9f0";
-        rowTextColor = "#2e3440";
-        break;
+        headerBg = "#2e3440"; subHeaderBg = "#3b4252"; textHeader = "#eceff4"; borderCol = "#4c566a"; rowBgPrimary = "#eceff4"; zebraBg = "#e5e9f0"; rowTextColor = "#2e3440"; break;
       case "dracula":
-        headerBg = "#282a36";
-        subHeaderBg = "#44475a";
-        textHeader = "#f8f8f2";
-        borderCol = "#6272a4";
-        rowBgPrimary = "#282a36";
-        zebraBg = "#21222c";
-        rowTextColor = "#f8f8f2";
-        break;
+        headerBg = "#282a36"; subHeaderBg = "#44475a"; textHeader = "#f8f8f2"; borderCol = "#6272a4"; rowBgPrimary = "#282a36"; zebraBg = "#21222c"; rowTextColor = "#f8f8f2"; break;
       case "cyberpunk":
-        headerBg = "#18181b";
-        subHeaderBg = "#27272a";
-        textHeader = "#f0abfc";
-        borderCol = "#d946ef";
-        rowBgPrimary = "#09090b";
-        zebraBg = "#18181b";
-        rowTextColor = "#e879f9";
-        break;
+        headerBg = "#18181b"; subHeaderBg = "#27272a"; textHeader = "#f0abfc"; borderCol = "#d946ef"; rowBgPrimary = "#09090b"; zebraBg = "#18181b"; rowTextColor = "#e879f9"; break;
       case "midnight":
-        headerBg = "#0f172a";
-        subHeaderBg = "#1e293b";
-        textHeader = "#e2e8f0";
-        borderCol = "#334155";
-        rowBgPrimary = "#111827";
-        zebraBg = "#0f172a";
-        rowTextColor = "#e2e8f0";
-        break;
+        headerBg = "#0f172a"; subHeaderBg = "#1e293b"; textHeader = "#e2e8f0"; borderCol = "#334155"; rowBgPrimary = "#111827"; zebraBg = "#0f172a"; rowTextColor = "#e2e8f0"; break;
       case "slate":
-        headerBg = "#1e293b";
-        subHeaderBg = "#334155";
-        textHeader = "#f8fafc";
-        borderCol = "#64748b";
-        rowBgPrimary = "#ffffff";
-        zebraBg = "#f8fafc";
-        rowTextColor = "#1e293b";
-        break;
+        headerBg = "#1e293b"; subHeaderBg = "#334155"; textHeader = "#f8fafc"; borderCol = "#64748b"; rowBgPrimary = "#ffffff"; zebraBg = "#f8fafc"; rowTextColor = "#1e293b"; break;
       case "teal":
-        headerBg = "#134e4a";
-        subHeaderBg = "#0f766e";
-        textHeader = "#ffffff";
-        borderCol = "#14b8a6";
-        rowBgPrimary = "#ffffff";
-        zebraBg = "#f0fdfa";
-        rowTextColor = "#134e4a";
-        break;
+        headerBg = "#134e4a"; subHeaderBg = "#0f766e"; textHeader = "#ffffff"; borderCol = "#14b8a6"; rowBgPrimary = "#ffffff"; zebraBg = "#f0fdfa"; rowTextColor = "#134e4a"; break;
       case "amber":
-        headerBg = "#92400e";
-        subHeaderBg = "#b45309";
-        textHeader = "#ffffff";
-        borderCol = "#f59e0b";
-        rowBgPrimary = "#ffffff";
-        zebraBg = "#fffbeb";
-        rowTextColor = "#451a03";
-        break;
+        headerBg = "#92400e"; subHeaderBg = "#b45309"; textHeader = "#ffffff"; borderCol = "#f59e0b"; rowBgPrimary = "#ffffff"; zebraBg = "#fffbeb"; rowTextColor = "#451a03"; break;
     }
 
     styleEl.textContent = `
@@ -307,11 +242,28 @@ export default class ForgejoPlugin extends Plugin {
   }
 
   async loadSettings() {
-    this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+    const data = await this.loadData();
+    this.settings = Object.assign({}, DEFAULT_SETTINGS, data);
+
+    // Unobfuscate stored Token from storage
+    if (this.settings.apiToken && this.settings.apiToken.startsWith('enc_b64:')) {
+      try {
+        this.settings.apiToken = atob(this.settings.apiToken.replace('enc_b64:', ''));
+      } catch {
+        this.settings.apiToken = '';
+      }
+    }
   }
 
   async saveSettings() {
-    await this.saveData(this.settings);
+    // Obfuscate token before saving to data.json
+    const rawToken = this.settings.apiToken;
+    const settingsToSave = Object.assign({}, this.settings);
+    if (rawToken) {
+      settingsToSave.apiToken = 'enc_b64:' + btoa(rawToken);
+    }
+
+    await this.saveData(settingsToSave);
     this.injectStyles();
     this.startAutoRefresh();
     this.refreshViews();
@@ -353,8 +305,14 @@ export default class ForgejoPlugin extends Plugin {
       cleanUrl = cleanUrl.replace(/[\[\]'"]/g, '').trim();
 
       const url = new URL(cleanUrl);
-      const parts = url.pathname.split('/').filter(p => p.length > 0);
       
+      // Strict origin validation against configured server URL
+      const configuredUrl = new URL(this.settings.serverUrl);
+      if (url.origin !== configuredUrl.origin) {
+        return null;
+      }
+
+      const parts = url.pathname.split('/').filter(p => p.length > 0);
       if (parts.length >= 2) {
         return { owner: parts[0], repo: parts[1], index: parts[3] || undefined };
       }
@@ -374,9 +332,19 @@ export default class ForgejoPlugin extends Plugin {
       }
     }
 
+    if (!this.settings.serverUrl) throw new Error('Server URL not set');
     const baseUrl = this.settings.serverUrl.replace(/\/$/, '');
+    
+    // Strict URL construction and protocol enforcement
+    const targetUrl = new URL(`${baseUrl}/api/v1/${endpoint.replace(/^\//, '')}`);
+    const configuredUrl = new URL(this.settings.serverUrl);
+    
+    if (targetUrl.origin !== configuredUrl.origin || (targetUrl.protocol !== 'http:' && targetUrl.protocol !== 'https:')) {
+      throw new Error('Blocked unauthorized request destination');
+    }
+
     const options: RequestUrlParam = {
-      url: `${baseUrl}/api/v1/${endpoint}`,
+      url: targetUrl.toString(),
       method: 'GET',
       headers: {
         'Accept': 'application/json',
@@ -398,10 +366,15 @@ export default class ForgejoPlugin extends Plugin {
   }
 
   async fetchRawFile(owner: string, repo: string, filepath: string): Promise<string | null> {
-    const baseUrl = this.settings.serverUrl.replace(/\/$/, '');
     try {
+      const baseUrl = this.settings.serverUrl.replace(/\/$/, '');
+      const targetUrl = new URL(`${baseUrl}/api/v1/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/raw/${filepath.replace(/^\//, '')}`);
+      const configuredUrl = new URL(this.settings.serverUrl);
+
+      if (targetUrl.origin !== configuredUrl.origin) return null;
+
       const options: RequestUrlParam = {
-        url: `${baseUrl}/api/v1/repos/${owner}/${repo}/raw/${filepath}`,
+        url: targetUrl.toString(),
         method: 'GET',
         headers: { 'Authorization': `token ${this.settings.apiToken}` }
       };
@@ -431,7 +404,7 @@ export default class ForgejoPlugin extends Plugin {
         if (text.includes("BSD 2-CLAUSE")) return "BSD-2-Clause";
         if (text.includes("MOZILLA PUBLIC LICENSE")) return "MPL-2.0";
         if (text.includes("UNLICENSE")) return "Unlicense";
-        return file.split('.')[0];
+        return escapeHtml(file.split('.')[0]);
       }
     }
     return "None";
@@ -439,26 +412,30 @@ export default class ForgejoPlugin extends Plugin {
 
   formatUser(user?: ForgejoUser): string {
     if (!user) return 'N/A';
-    const avatar = user.avatar_url ? `<img src="${user.avatar_url}" class="forgejo-avatar" alt="${user.login}" />` : '';
-    return `<div class="forgejo-user">${avatar}<span>${user.login}</span></div>`;
+    const cleanLogin = escapeHtml(user.login);
+    const cleanAvatar = user.avatar_url ? sanitizeUrl(user.avatar_url) : '';
+    const avatar = cleanAvatar && cleanAvatar !== '#' 
+      ? `<img src="${cleanAvatar}" class="forgejo-avatar" alt="${cleanLogin}" />` 
+      : '';
+    return `<div class="forgejo-user">${avatar}<span>${cleanLogin}</span></div>`;
   }
 
   formatStatus(status: string): string {
-  const state = (status || 'UNKNOWN').toUpperCase();
-  const cls = state === 'OPEN' ? 'forgejo-badge-open' : 'forgejo-badge-closed';
-  
-  let icon = '';
-  if (this.settings.useSvgIcons) {
-    icon = state === 'OPEN' ? SVG_OPEN_LABEL : SVG_CLOSED_LABEL;
-  }
+    const state = escapeHtml((status || 'UNKNOWN').toUpperCase());
+    const cls = state === 'OPEN' ? 'forgejo-badge-open' : 'forgejo-badge-closed';
+    
+    let icon = '';
+    if (this.settings.useSvgIcons) {
+      icon = state === 'OPEN' ? SVG_OPEN_LABEL : SVG_CLOSED_LABEL;
+    }
 
-  return `<span class="forgejo-badge ${cls}">${icon}${icon ? ' ' : ''}${state}</span>`;
+    return `<span class="forgejo-badge ${cls}">${icon}${icon ? ' ' : ''}${state}</span>`;
   }
 
   formatDate(dateStr?: string | null): string {
     if (!dateStr) return 'N/A';
     const d = new Date(dateStr);
-    return isNaN(d.getTime()) ? 'N/A' : d.toLocaleDateString();
+    return isNaN(d.getTime()) ? 'N/A' : escapeHtml(d.toLocaleDateString());
   }
 
   extractPushDate(repo: ForgejoRepo): string {
@@ -485,7 +462,7 @@ export default class ForgejoPlugin extends Plugin {
 
     const parsed = this.parseUrl(rawUrl);
     if (!parsed || !parsed.index) {
-      container.createEl('p', { text: `❌ Invalid URL: "${rawUrl}"`, cls: 'mod-warning' });
+      container.createEl('p', { text: `❌ Invalid URL or unauthorized domain: "${escapeHtml(rawUrl)}"`, cls: 'mod-warning' });
       return;
     }
 
@@ -500,28 +477,30 @@ export default class ForgejoPlugin extends Plugin {
         const data = await this.fetchApi<ForgejoPR>(endpoint);
         container.empty();
         this.buildSingleTable(container, `Pull Request #${data.number}`, [
-          ['Title', data.title || 'N/A'],
+          ['Title', escapeHtml(data.title || 'N/A')],
           ['Status', this.formatStatus(data.state)],
           ['Author', this.formatUser(data.user)],
           ['Created', this.formatDate(data.created_at)],
-          ['Link', `<a href="${data.html_url}" target="_blank">Open</a>`]
+          ['Link', `<a href="${sanitizeUrl(data.html_url, this.settings.serverUrl)}" target="_blank" rel="noopener">Open</a>`]
         ]);
       } else {
         const data = await this.fetchApi<ForgejoIssue>(endpoint);
         container.empty();
-        const labels = data.labels && data.labels.length > 0 ? data.labels.map(l => l.name).join(', ') : 'None';
+        const labels = data.labels && data.labels.length > 0 
+          ? data.labels.map(l => escapeHtml(l.name)).join(', ') 
+          : 'None';
         this.buildSingleTable(container, `Issue #${data.number}`, [
-          ['Title', data.title || 'N/A'],
+          ['Title', escapeHtml(data.title || 'N/A')],
           ['Status', this.formatStatus(data.state)],
           ['Author', this.formatUser(data.user)],
           ['Labels', labels],
           ['Created', this.formatDate(data.created_at)],
-          ['Link', `<a href="${data.html_url}" target="_blank">Open</a>`]
+          ['Link', `<a href="${sanitizeUrl(data.html_url, this.settings.serverUrl)}" target="_blank" rel="noopener">Open</a>`]
         ]);
       }
     } catch (err) {
       container.empty();
-      container.createEl('p', { text: `Fetch error: ${err instanceof Error ? err.message : String(err)}`, cls: 'mod-warning' });
+      container.createEl('p', { text: `Fetch error: ${escapeHtml(err instanceof Error ? err.message : String(err))}`, cls: 'mod-warning' });
     }
   }
 
@@ -535,7 +514,7 @@ export default class ForgejoPlugin extends Plugin {
 
     const parsed = this.parseUrl(rawUrl);
     if (!parsed) {
-      container.createEl('p', { text: `❌ Invalid Repository URL: "${rawUrl}"`, cls: 'mod-warning' });
+      container.createEl('p', { text: `❌ Invalid Repository URL or unauthorized domain: "${escapeHtml(rawUrl)}"`, cls: 'mod-warning' });
       return;
     }
 
@@ -549,7 +528,7 @@ export default class ForgejoPlugin extends Plugin {
       const items = await this.fetchApi<any[]>(endpoint);
       container.empty();
 
-      const title = `${type === 'pr' ? 'Pull Requests' : 'Issues'} (${state.toUpperCase()}) - ${parsed.owner}/${parsed.repo}`;
+      const title = `${type === 'pr' ? 'Pull Requests' : 'Issues'} (${state.toUpperCase()}) - ${escapeHtml(parsed.owner)}/${escapeHtml(parsed.repo)}`;
       const headers = ['ID', 'Title', 'Status', 'Author', 'Created', 'Link'];
 
       if (!items || items.length === 0) {
@@ -559,17 +538,17 @@ export default class ForgejoPlugin extends Plugin {
 
       const rows = items.map(item => [
         `#${item.number}`,
-        item.title || 'N/A',
+        escapeHtml(item.title || 'N/A'),
         this.formatStatus(item.state),
         this.formatUser(item.user),
         this.formatDate(item.created_at),
-        `<a href="${item.html_url}" target="_blank">Open</a>`
+        `<a href="${sanitizeUrl(item.html_url, this.settings.serverUrl)}" target="_blank" rel="noopener">Open</a>`
       ]);
 
       this.buildStructuredTable(container, title, headers, rows);
     } catch (err) {
       container.empty();
-      container.createEl('p', { text: `Fetch error: ${err instanceof Error ? err.message : String(err)}`, cls: 'mod-warning' });
+      container.createEl('p', { text: `Fetch error: ${escapeHtml(err instanceof Error ? err.message : String(err))}`, cls: 'mod-warning' });
     }
   }
 
@@ -587,36 +566,36 @@ export default class ForgejoPlugin extends Plugin {
       return;
     }
 
-    container.createEl('span', { text: `Loading PRs for user ${cleanUser}...` });
+    container.createEl('span', { text: `Loading PRs for user ${escapeHtml(cleanUser)}...` });
 
     try {
-      const endpoint = `repos/issues/search?state=${state}&type=pulls&created_by=${cleanUser}`;
+      const endpoint = `repos/issues/search?state=${state}&type=pulls&created_by=${encodeURIComponent(cleanUser)}`;
       const response = await this.fetchApi<any>(endpoint);
       const items: ForgejoPR[] = Array.isArray(response) ? response : (response.data || []);
       
       container.empty();
 
-      const title = `Pull Requests (${state.toUpperCase()}) - User: ${cleanUser}`;
+      const title = `Pull Requests (${state.toUpperCase()}) - User: ${escapeHtml(cleanUser)}`;
       const headers = ['Repo', 'ID', 'Title', 'Status', 'Created', 'Link'];
 
       if (!items || items.length === 0) {
-        this.buildStructuredTable(container, title, headers, [], `No pull requests found for user "${cleanUser}" with state "${state}".`);
+        this.buildStructuredTable(container, title, headers, [], `No pull requests found for user "${escapeHtml(cleanUser)}" with state "${state}".`);
         return;
       }
 
       const rows = items.map(item => [
-        item.repository ? item.repository.full_name : 'N/A',
+        escapeHtml(item.repository ? item.repository.full_name : 'N/A'),
         `#${item.number}`,
-        item.title || 'N/A',
+        escapeHtml(item.title || 'N/A'),
         this.formatStatus(item.state),
         this.formatDate(item.created_at),
-        `<a href="${item.html_url}" target="_blank">Open</a>`
+        `<a href="${sanitizeUrl(item.html_url, this.settings.serverUrl)}" target="_blank" rel="noopener">Open</a>`
       ]);
 
       this.buildStructuredTable(container, title, headers, rows);
     } catch (err) {
       container.empty();
-      container.createEl('p', { text: `Fetch error: ${err instanceof Error ? err.message : String(err)}`, cls: 'mod-warning' });
+      container.createEl('p', { text: `Fetch error: ${escapeHtml(err instanceof Error ? err.message : String(err))}`, cls: 'mod-warning' });
     }
   }
 
@@ -625,7 +604,7 @@ export default class ForgejoPlugin extends Plugin {
     const container = el.createDiv({ cls: 'forgejo-container' });
     const parsed = this.parseUrl(rawUrl);
     if (!parsed) {
-      container.createEl('p', { text: `❌ Invalid Repository URL: "${rawUrl}"`, cls: 'mod-warning' });
+      container.createEl('p', { text: `❌ Invalid Repository URL or unauthorized domain: "${escapeHtml(rawUrl)}"`, cls: 'mod-warning' });
       return;
     }
 
@@ -644,13 +623,13 @@ export default class ForgejoPlugin extends Plugin {
       let lastReleaseTag = 'None';
       try {
         const releases = await this.fetchApi<ForgejoRelease[]>(`repos/${parsed.owner}/${parsed.repo}/releases`);
-        if (releases && releases.length > 0) lastReleaseTag = releases[0].tag_name || releases[0].name;
+        if (releases && releases.length > 0) lastReleaseTag = escapeHtml(releases[0].tag_name || releases[0].name);
       } catch { /* Suppress */ }
 
       container.empty();
       const headers = ['Name', 'Issues (O/C)', 'PRs (O/C)', 'Created', 'Last Push', 'Release', 'License'];
       const rows = [[
-        `<a href="${repo.html_url}" target="_blank">${parsed.repo}</a>`,
+        `<a href="${sanitizeUrl(repo.html_url, this.settings.serverUrl)}" target="_blank" rel="noopener">${escapeHtml(parsed.repo)}</a>`,
         `${openIssues.length} / ${closedIssues.length}`,
         `${openPRs.length} / ${closedPRs.length}`,
         this.formatDate(repo.created_at),
@@ -659,10 +638,10 @@ export default class ForgejoPlugin extends Plugin {
         license
       ]];
 
-      this.buildStructuredTable(container, `Repository: ${repo.full_name}`, headers, rows);
+      this.buildStructuredTable(container, `Repository: ${escapeHtml(repo.full_name)}`, headers, rows);
     } catch (err) {
       container.empty();
-      container.createEl('p', { text: `Fetch error: ${err instanceof Error ? err.message : String(err)}`, cls: 'mod-warning' });
+      container.createEl('p', { text: `Fetch error: ${escapeHtml(err instanceof Error ? err.message : String(err))}`, cls: 'mod-warning' });
     }
   }
 
@@ -692,10 +671,10 @@ export default class ForgejoPlugin extends Plugin {
           this.detectLicense(repo.owner.login, repo.name)
         ]);
 
-        const lastRelease = releases && releases.length > 0 ? (releases[0].tag_name || releases[0].name) : 'None';
+        const lastRelease = releases && releases.length > 0 ? escapeHtml(releases[0].tag_name || releases[0].name) : 'None';
 
         return [
-          `<a href="${repo.html_url}" target="_blank">${repo.name}</a>`,
+          `<a href="${sanitizeUrl(repo.html_url, this.settings.serverUrl)}" target="_blank" rel="noopener">${escapeHtml(repo.name)}</a>`,
           this.renderVisibility(repo.private),
           `${openI.length} / ${closedI.length}`,
           `${openP.length} / ${closedP.length}`,
@@ -709,138 +688,132 @@ export default class ForgejoPlugin extends Plugin {
       this.buildStructuredTable(container, 'User Repositories Overview', headers, rowsData);
     } catch (err) {
       container.empty();
-      container.createEl('p', { text: `Fetch error: ${err instanceof Error ? err.message : String(err)}`, cls: 'mod-warning' });
+      container.createEl('p', { text: `Fetch error: ${escapeHtml(err instanceof Error ? err.message : String(err))}`, cls: 'mod-warning' });
     }
   }
 
-  // Hilfsmethode zur Bereinigung von HTML-String für Vergleiche beim Sortieren
   private stripHtml(html: string): string {
     const tmp = document.createElement('DIV');
-    tmp.innerHTML = html;
-    return tmp.textContent || tmp.innerText || '';
+    tmp.textContent = html;
+    return tmp.textContent || '';
   }
 
   buildStructuredTable(parent: HTMLElement, title: string, headers: string[], rows: string[][], fallbackText?: string) {
-  let currentRows = [...rows];
-  let sortColumnIndex: number | null = null;
-  let sortAscending = true;
+    let currentRows = [...rows];
+    let sortColumnIndex: number | null = null;
+    let sortAscending = true;
 
-  const table = parent.createEl('table', { cls: 'forgejo-table' });
-  const thead = table.createEl('thead');
+    const table = parent.createEl('table', { cls: 'forgejo-table' });
+    const thead = table.createEl('thead');
 
-  const titleRow = thead.createEl('tr', { cls: 'forgejo-title-row' });
-  const titleTh = titleRow.createEl('th', { text: title, attr: { colspan: String(headers.length) } });
-  titleTh.addClass('forgejo-main-header');
+    const titleRow = thead.createEl('tr', { cls: 'forgejo-title-row' });
+    const titleTh = titleRow.createEl('th', { attr: { colspan: String(headers.length) } });
+    titleTh.textContent = title;
+    titleTh.addClass('forgejo-main-header');
 
-  const headerRow = thead.createEl('tr', { cls: 'forgejo-cols-row' });
-  const tbody = table.createEl('tbody');
+    const headerRow = thead.createEl('tr', { cls: 'forgejo-cols-row' });
+    const tbody = table.createEl('tbody');
 
-  const renderTbody = () => {
-    tbody.empty();
-    if (currentRows.length === 0) {
-      const emptyRow = tbody.createEl('tr');
-      const emptyTd = emptyRow.createEl('td', { attr: { colspan: String(headers.length) }, cls: 'forgejo-fallback-cell' });
-      emptyTd.textContent = fallbackText || 'No data available.';
-      return;
-    }
-
-    for (const rowContent of currentRows) {
-      const tr = tbody.createEl('tr');
-      for (const cell of rowContent) {
-        const td = tr.createEl('td');
-        if (cell.includes('<a ') || cell.includes('<div ') || cell.includes('<span ') || cell.includes('<img ') || cell.includes('<svg ')) {
-          td.innerHTML = cell;
-        } else {
-          td.textContent = cell;
-        }
-      }
-    }
-  };
-
-  const updateHeaders = () => {
-    headerRow.empty();
-    headers.forEach((h, index) => {
-      const th = headerRow.createEl('th');
-      
-      // Link-Spalte explizit von der Sortierung ausschließen
-      if (h.toLowerCase() === 'link') {
-        th.textContent = h;
+    const renderTbody = () => {
+      tbody.empty();
+      if (currentRows.length === 0) {
+        const emptyRow = tbody.createEl('tr');
+        const emptyTd = emptyRow.createEl('td', { attr: { colspan: String(headers.length) }, cls: 'forgejo-fallback-cell' });
+        emptyTd.textContent = fallbackText || 'No data available.';
         return;
       }
 
-      if (rows.length > 1) {
-        th.addClass('forgejo-sortable-th');
-        const wrapper = th.createDiv({ cls: 'forgejo-th-content' });
-        wrapper.createSpan({ text: h });
+      for (const rowContent of currentRows) {
+        const tr = tbody.createEl('tr');
+        for (const cell of rowContent) {
+          const td = tr.createEl('td');
+          if (cell.includes('<a ') || cell.includes('<div ') || cell.includes('<span ') || cell.includes('<img ') || cell.includes('<svg ')) {
+            td.innerHTML = cell;
+          } else {
+            td.textContent = cell;
+          }
+        }
+      }
+    };
 
-        const iconContainer = wrapper.createSpan();
-        if (sortColumnIndex === index) {
-          iconContainer.innerHTML = sortAscending ? SVG_SORT_ASC : SVG_SORT_DESC;
-        } else {
-          iconContainer.innerHTML = SVG_SORT_ASC;
-          (iconContainer.firstChild as HTMLElement)?.setAttribute('style', 'opacity: 0.2;');
+    const updateHeaders = () => {
+      headerRow.empty();
+      headers.forEach((h, index) => {
+        const th = headerRow.createEl('th');
+        
+        if (h.toLowerCase() === 'link') {
+          th.textContent = h;
+          return;
         }
 
-        th.addEventListener('click', () => {
+        if (rows.length > 1) {
+          th.addClass('forgejo-sortable-th');
+          const wrapper = th.createDiv({ cls: 'forgejo-th-content' });
+          wrapper.createSpan({ text: h });
+
+          const iconContainer = wrapper.createSpan();
           if (sortColumnIndex === index) {
-            sortAscending = !sortAscending;
+            iconContainer.innerHTML = sortAscending ? SVG_SORT_ASC : SVG_SORT_DESC;
           } else {
-            sortColumnIndex = index;
-            sortAscending = true;
+            iconContainer.innerHTML = SVG_SORT_ASC;
+            (iconContainer.firstChild as HTMLElement)?.setAttribute('style', 'opacity: 0.2;');
           }
 
-          currentRows.sort((a, b) => {
-            const valA = this.stripHtml(a[index]).trim();
-            const valB = this.stripHtml(b[index]).trim();
-
-            // 1. Numerische Sortierung (z.B. #123) – Ausschließen von Datumsformaten mit Punkt oder Slash
-            const numA = parseFloat(valA.replace('#', ''));
-            const numB = parseFloat(valB.replace('#', ''));
-
-            if (!isNaN(numA) && !isNaN(numB) && !valA.includes('.') && !valA.includes('/')) {
-              return sortAscending ? numA - numB : numB - numA;
+          th.addEventListener('click', () => {
+            if (sortColumnIndex === index) {
+              sortAscending = !sortAscending;
+            } else {
+              sortColumnIndex = index;
+              sortAscending = true;
             }
 
-            // 2. Robuste Datums-Parsierung (unterstützt DD.MM.YYYY, MM/DD/YYYY, YYYY-MM-DD)
-            const parseCustomDate = (str: string): number => {
-              if (!str || str === 'N/A' || str === 'None') return 0;
-              
-              // Deutsches Format: DD.MM.YYYY
-              const deMatch = str.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/);
-              if (deMatch) {
-                return new Date(parseInt(deMatch[3]), parseInt(deMatch[2]) - 1, parseInt(deMatch[1])).getTime();
+            currentRows.sort((a, b) => {
+              const valA = this.stripHtml(a[index]).trim();
+              const valB = this.stripHtml(b[index]).trim();
+
+              const numA = parseFloat(valA.replace('#', ''));
+              const numB = parseFloat(valB.replace('#', ''));
+
+              if (!isNaN(numA) && !isNaN(numB) && !valA.includes('.') && !valA.includes('/')) {
+                return sortAscending ? numA - numB : numB - numA;
               }
 
-              // Standard JS Date Parsing Fallback
-              const timestamp = Date.parse(str);
-              return isNaN(timestamp) ? -1 : timestamp;
-            };
+              const parseCustomDate = (str: string): number => {
+                if (!str || str === 'N/A' || str === 'None') return 0;
+                
+                const deMatch = str.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/);
+                if (deMatch) {
+                  return new Date(parseInt(deMatch[3]), parseInt(deMatch[2]) - 1, parseInt(deMatch[1])).getTime();
+                }
 
-            const dateA = parseCustomDate(valA);
-            const dateB = parseCustomDate(valB);
+                const timestamp = Date.parse(str);
+                return isNaN(timestamp) ? -1 : timestamp;
+              };
 
-            if (dateA !== -1 && dateB !== -1 && (dateA > 0 || dateB > 0)) {
-              return sortAscending ? dateA - dateB : dateB - dateA;
-            }
+              const dateA = parseCustomDate(valA);
+              const dateB = parseCustomDate(valB);
 
-            // 3. Fallback: Alphabetische Sortierung
-            return sortAscending 
-              ? valA.localeCompare(valB, undefined, { numeric: true, sensitivity: 'base' })
-              : valB.localeCompare(valA, undefined, { numeric: true, sensitivity: 'base' });
+              if (dateA !== -1 && dateB !== -1 && (dateA > 0 || dateB > 0)) {
+                return sortAscending ? dateA - dateB : dateB - dateA;
+              }
+
+              return sortAscending 
+                ? valA.localeCompare(valB, undefined, { numeric: true, sensitivity: 'base' })
+                : valB.localeCompare(valA, undefined, { numeric: true, sensitivity: 'base' });
+            });
+
+            updateHeaders();
+            renderTbody();
           });
+        } else {
+          th.textContent = h;
+        }
+      });
+    };
 
-          updateHeaders();
-          renderTbody();
-        });
-      } else {
-        th.textContent = h;
-      }
-    });
-  };
-
-  updateHeaders();
-  renderTbody();
-}
+    updateHeaders();
+    renderTbody();
+  }
 
   buildSingleTable(parent: HTMLElement, typeTitle: string, rows: [string, string][]) {
     const table = parent.createEl('table', { cls: 'forgejo-table' });
@@ -848,7 +821,8 @@ export default class ForgejoPlugin extends Plugin {
     
     if (this.settings.tableLayout === 'vertical') {
       const titleRow = thead.createEl('tr', { cls: 'forgejo-title-row' });
-      const th = titleRow.createEl('th', { text: typeTitle, attr: { colspan: '2' } });
+      const th = titleRow.createEl('th', { attr: { colspan: '2' } });
+      th.textContent = typeTitle;
       th.addClass('forgejo-main-header');
 
       const tbody = table.createEl('tbody');
@@ -861,7 +835,8 @@ export default class ForgejoPlugin extends Plugin {
       }
     } else {
       const titleRow = thead.createEl('tr', { cls: 'forgejo-title-row' });
-      const th = titleRow.createEl('th', { text: typeTitle, attr: { colspan: String(rows.length) } });
+      const th = titleRow.createEl('th', { attr: { colspan: String(rows.length) } });
+      th.textContent = typeTitle;
       th.addClass('forgejo-main-header');
 
       const headerRow = thead.createEl('tr', { cls: 'forgejo-cols-row' });
@@ -912,7 +887,7 @@ class ForgejoSettingTab extends PluginSettingTab {
         .setPlaceholder('https://my-forgejo-instance.com')
         .setValue(this.plugin.settings.serverUrl)
         .onChange(async (value) => {
-          this.plugin.settings.serverUrl = value;
+          this.plugin.settings.serverUrl = value.trim();
           await this.plugin.saveSettings();
         }));
 
@@ -925,7 +900,7 @@ class ForgejoSettingTab extends PluginSettingTab {
           .setPlaceholder('Enter your API token')
           .setValue(this.plugin.settings.apiToken)
           .onChange(async (value) => {
-            this.plugin.settings.apiToken = value;
+            this.plugin.settings.apiToken = value.trim();
             await this.plugin.saveSettings();
           });
       });
