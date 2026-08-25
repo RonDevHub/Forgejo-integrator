@@ -6,7 +6,7 @@
     "build": "tsc -noEmit && esbuild main.ts --bundle --external:obsidian --format=cjs --target=es2020 --outfile=main.js",
     "dev": "esbuild main.ts --bundle --external:obsidian --format=cjs --target=es2020 --outfile=main.js --watch"
   },
-  "keywords": [],
+  "keywords": [forgejo, gitea, codeberg],
   "author": "RonDev",
   "license": "MIT",
   "devDependencies": {
