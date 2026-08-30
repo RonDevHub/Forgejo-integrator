@@ -36,8 +36,9 @@ Navigate to **Settings > Forgejo Integrator** to configure the plugin:
 3. **Table Theme**: Select a theme (`dark`, `light`, `blue`, `purple`, `mono`, `sepia`, `nord`, `dracula`, `cyberpunk`, `midnight`, `slate`, `teal`, `amber`).
 4. **Table Layout**: Toggle between `vertical` and `horizontal` presentation for single-item blocks.
 5. **Enable Caching**: Toggle local disk/memory caching to minimize network requests.
-6. **Refresh Interval**: Set auto-update frequency (Realtime, 1 min, 5 min, 30 min, 1 hr).
-7. **Test Connection**: Click the **Test Connection** button to verify your API credentials.
+6. **Display Language**: Select the output language for tables
+7. **Refresh Interval**: Set auto-update frequency (Realtime, 1 min, 5 min, 30 min, 1 hr).
+8. **Test Connection**: Click the **Test Connection** button to verify your API credentials.
 
 ---
 
