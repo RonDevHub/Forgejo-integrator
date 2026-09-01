@@ -40,6 +40,9 @@ interface TranslationKeys {
   invalidUrl: string;
   invalidUsername: string;
   fetchError: string;
+  contributions: string;
+  less: string;
+  more: string;
 }
 
 const TRANSLATIONS: Record<string, TranslationKeys> = {
@@ -73,6 +76,9 @@ const TRANSLATIONS: Record<string, TranslationKeys> = {
     invalidUrl: "❌ Invalid URL or unauthorized domain",
     invalidUsername: "❌ Invalid Username specified.",
     fetchError: "Fetch error",
+    contributions: "contributions in the last",
+    less: "Less",
+    more: "More",
   },
   de: {
     title: "Titel",
@@ -104,6 +110,9 @@ const TRANSLATIONS: Record<string, TranslationKeys> = {
     invalidUrl: "❌ Ungültige URL oder nicht autorisierte Domain",
     invalidUsername: "❌ Ungültiger Benutzername angegeben.",
     fetchError: "Fehler beim Abrufen",
+    contributions: "Beiträge in den letzten",
+    less: "Weniger",
+    more: "Mehr",
   },
 };
 
@@ -192,16 +201,20 @@ interface ForgejoRepo {
   open_issues_count: number;
 }
 
+interface HeatmapDay {
+  timestamp: number;
+  contributions: number;
+}
+
 const SVG_LOCK = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 560" class="forgejo-icon"><path fill="currentColor" d="M258.8 380c-3.9 3.1-6.7 7.6-6.7 12.6l0 27.4c0 15.5-12.5 28-28 28s-28-12.5-28-28l0-27.4c0-5-2.8-9.5-6.7-12.6-13-10.3-21.3-26.1-21.3-44 0-30.9 25.1-56 56-56s56 25.1 56 56c0 17.8-8.3 33.7-21.3 44zM84.2 140l0 40.9c-16.9 5.9-31.9 14.4-44.3 26.8-17.3 17.3-27 39.5-32.5 65.1-9.8 45.4-9.8 137 0 182.4 5.5 25.6 15.2 47.8 32.5 65.1s39.5 27 65.1 32.5c25.3 5.5 55.7 7.2 91.2 7.2l56 0c35.6 0 65.9-1.7 91.2-7.2 25.6-5.5 47.8-15.2 65.1-32.5s27-39.5 32.5-65.1c9.8-45.4 9.8-137 0-182.4-5.5-25.6-15.2-47.8-32.5-65.1-12.4-12.4-27.4-20.9-44.3-26.8l0-40.9c0-40.3-12.9-75.9-38.5-101.5S264.4 0 224.2 0 148.3 12.9 122.7 38.5 84.2 99.7 84.2 140zm78.1-61.9C175.6 64.8 196 56 224.2 56s48.6 8.8 61.9 22.1 22.1 33.7 22.1 61.9l0 30.1c-17-1.5-35.6-2.1-56-2.1l-56 0c-20.4 0-39 .6-56 2.1l0-30.1c0-28.2 8.8-48.6 22.1-61.9zM62.1 284.6c4.1-19 10.1-30.1 17.4-37.3s18.3-13.3 37.3-17.4c19.3-4.2 45-5.9 79.4-5.9l56 0c34.4 0 60.1 1.8 79.4 5.9 19 4.1 30.1 10.1 37.3 17.4s13.3 18.3 17.4 37.3c4.2 19.3 5.9 45 5.9 79.4s-1.8 60.1-5.9 79.4c-4.1-19-10.1-30.1-17.4-37.3s-18.3 13.3-37.3 17.4c-19.3-4.2-45-5.9-79.4-5.9l-56 0c-34.4 0-60.1-1.8-79.4-5.9-19-4.1-30.1-10.1-37.3-17.4s-13.3-18.3-17.4-37.3c-4.2-19.3-5.9-45-5.9-79.4s1.8-60.1 5.9-79.4z"/></svg>`;
 const SVG_GLOBE = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 560" class="forgejo-icon"><path fill="currentColor" d="M69.6 192.2c21.5-63.1 68.3-108.2 136.1-126.8-37.3 60.9-51.5 136.6-52.2 209.2-25.5-2.4-46.3-5.3-62.9-8.2-17.6-3.1-35.5-6.2-52.3-12.5-14.3-5.6-30.5 1.3-36.2 15.7-5.7 14.4 1.2 30.7 15.6 36.4 20.3 8 42 11.9 63.4 15.6 19.7 3.4 44.5 6.8 74.8 9.5 5.3 57.9 20.4 115.4 49.9 163.6-64.8-17.7-110.4-59.7-133-118.2-5.6-14.4-21.8-21.6-36.2-16s-21.6 21.8-16 36.2C60.5 500.2 155.6 560 280 560s219.6-59.8 259.6-163.5c5.6-14.4-1.6-30.6-16-36.2s-30.6 1.6-36.2 16c-22.6 58.6-68.1 100.5-133 118.2 29.5-48.2 44.6-105.7 49.9-163.6 30.3-2.6 55-6 74.8-9.5 21.4-3.7 43.1-7.5 63.4-15.6 14.4-5.7 21.3-22 15.6-36.4-5.7-14.3-21.9-21.3-36.2-15.7-16.8 6.3-34.7 9.4-52.3 12.5-16.6 2.9-37.4 5.8-62.9 8.2-.7-72.7-14.8-148.3-52.2-209.2 67.8 18.5 114.6 63.6 136.1 126.8 5 14.6 20.9 22.5 35.5 17.5s22.5-20.9 17.5-35.5C506.1 64.2 408.8 0 280 0S53.9 64.2 16.5 174.1c-5 14.6 2.9 30.5 17.5 35.5s30.5-2.9 35.5-17.5zM212.4 334.6c20.7 .9 43.2 1.4 67.6 1.4s47-.5 67.6-1.4c-7.3 65.5-28.7 124.4-67.6 165.1-38.9-40.7-60.4-99.6-67.6-165.1zM280 60.3c49.2 51.5 70.3 131.9 70.6 218.2-21.3 1-44.7 1.5-70.6 1.5s-49.3-.6-70.6-1.5c.2-86.3 21.3-166.7 70.6-218.2z"/></svg>`;
 
 const SVG_SORT_ASC = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 616 560" class="forgejo-sort-icon"><path fill="currentColor" d="M309.6 216.7c0-9.5-2.2-19.6-7.6-28.8-12.4-21.5-55.1-89.5-123.4-126-7.7-4.1-15.9-5.9-23.8-5.9s-16.1 1.8-23.8 5.9c-68.3 36.5-111 104.5-123.4 126-5.3 9.3-7.6 19.3-7.6 28.8 0 23.5 14.5 48.1 42.2 54 17.3 3.7 44.4 7.6 84.6 8.8l0 196.4c0 15.5 12.5 28 28 28s28-12.5 28-28l0-196.4c40.3-1.3 67.3-5.1 84.6-8.8 27.7-5.9 42.2-30.6 42.2-54zm-154.8-104c52.3 29.1 87.5 84.2 98.8 103.7-16.9 3.4-47.9 7.6-98.8 7.6S73 219.9 56 216.4c11.3-19.5 46.5-74.6 98.8-103.7zM364 84c-15.5 0-28 12.5-28 28s12.5 28 28 28l224 0c15.5 0 28-12.5 28-28s-12.5-28-28-28L364 84zM336 448c0-15.5 12.5-28 28-28l112 0c15.5 0 28 12.5 28 28s-12.5 28-28 28l-112 0c-15.5 0-28-12.5-28-28zm28-196c-15.5 0-28 12.5-28 28s12.5 28 28 28l168 0c15.5 0 28-12.5 28-28s-12.5-28-28-28l-168 0z"/></svg>`;
-const SVG_SORT_DESC = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 616 560" class="forgejo-sort-icon"><path fill="currentColor" d="M309.6 343.3c0 9.5-2.2 19.6-7.6 28.8-12.4 21.5-55.1 89.5-123.4 126-7.7 4.1-15.9 5.9-23.8 5.9s-16.1-1.8-23.8-5.9c-68.3-36.5-111-104.5-123.4-126-5.3-9.3-7.6-19.3-7.6-28.8 0-23.5 14.5-48.1 42.2-54 17.3-3.7 44.4-7.6 84.6-8.8l0-196.4c0-15.5 12.5-28 28-28s28 12.5 28 28l0 196.4c40.3 1.3 67.3 5.1 84.6 8.8 27.7 5.9 42.2 30.6 42.2 54zm-154.8 104c52.3-29.1 87.5-84.2 98.8-103.7-16.9-3.4-47.9-7.6-98.8-7.6S73 340.1 56 343.6c11.3 19.5 46.5 74.6 98.8 103.7zM364 84c-15.5 0-28 12.5-28 28s12.5 28 28 28l224 0c15.5 0 28-12.5 28-28s-12.5-28-28-28L364 84zM336 448c0-15.5 12.5-28 28-28l112 0c15.5 0 28 12.5 28 28s-12.5 28-28 28l-112 0c-15.5 0-28-12.5-28-28zm28-196c-15.5 0-28 12.5-28 28s12.5 28 28 28l168 0c15.5 0 28-12.5 28-28s-12.5-28-28-28l-168 0z"/></svg>`;
+const SVG_SORT_DESC = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 616 560" class="forgejo-sort-icon"><path fill="currentColor" d="M309.6 343.3c0 9.5-2.2 19.6-7.6 28.8-12.4 21.5-55.1 89.5-123.4 126-7.7 4.1-15.9 5.9-23.8 5.9s-16.1-1.8-23.8-5.9c-68.3-36.5-111-104.5-123.4-126-5.3-9.3-7.6-19.3-7.6-28.8 0-23.5 14.5 48.1 42.2-54 17.3-3.7 44.4-7.6 84.6-8.8l0-196.4c0-15.5 12.5-28 28-28s28 12.5 28 28l0 196.4c40.3 1.3 67.3 5.1 84.6 8.8 27.7 5.9 42.2 30.6 42.2 54zm-154.8 104c52.3-29.1 87.5-84.2 98.8-103.7-16.9-3.4-47.9-7.6-98.8-7.6S73 340.1 56 343.6c11.3 19.5 46.5 74.6 98.8 103.7zM364 84c-15.5 0-28 12.5-28 28s12.5 28 28 28l224 0c15.5 0 28-12.5 28-28s-12.5-28-28-28L364 84zM336 448c0-15.5 12.5-28 28-28l112 0c15.5 0 28 12.5 28 28s-12.5 28-28 28l-112 0c-15.5 0-28-12.5-28-28zm28-196c-15.5 0-28 12.5-28 28s12.5 28 28 28l168 0c15.5 0 28-12.5 28-28s-12.5-28-28-28l-168 0z"/></svg>`;
 
 const SVG_OPEN_LABEL = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 672 560" class="forgejo-icon"><path fill="currentColor" d="M370.7 380c-3.9 3.1-6.7 7.6-6.7 12.6l0 27.4c0 15.5-12.5 28-28 28s-28-12.5-28-28l0-27.4c0-5-2.8-9.5-6.7-12.6-13-10.3-21.3-26.1-21.3-44 0-30.9 25.1-56 56-56s56 25.1 56 56c0 17.8-8.3 33.7-21.3 44zM470.1 78.1C456.8 91.4 448 111.8 448 140l0 33.8c26.6 4.8 52.9 14.5 72.3 33.9 17.3 17.3 27 39.5 32.5 65.1 9.8 45.4 9.8 137 0 182.4-5.5 25.6-15.2 47.8-32.5 65.1s-39.5 27-65.1 32.5c-25.3 5.5-55.7 7.2-91.2 7.2l-56 0c-35.6 0-65.9-1.7-91.2-7.2-25.6-5.5-47.8-15.2-65.1-32.5s-27-39.5-32.5-65.1c-9.8-45.4-9.8-137 0-182.4 5.5-25.6 15.2-47.8 32.5-65.1s39.5-27 65.1-32.5c25.3-5.5 55.7-7.2 91.2-7.2l56 0c9.7 0 19.1 .1 28 .4l0-28.4c0-40.3 12.9-75.9 38.5-101.5S491.7 0 532 0 607.9 12.9 633.5 38.5 672 99.7 672 140l0 56c0 15.5-12.5 28-28 28s-28-12.5-28-28l0-56c0-28.2-8.8-48.6-22.1-61.9S560.2 56 532 56 483.4 64.8 470.1 78.1zM173.9 284.6c-4.2 19.3-5.9 45-5.9 79.4s1.8 60.1 5.9 79.4c4.1 19 10.1 30.1 17.4 37.3s18.3 13.3 37.3 17.4c19.3 4.2 45 5.9 79.4 5.9l56 0c34.4 0 60.1-1.8 79.4-5.9 19-4.1 30.1-10.1 37.3-17.4s13.3-18.3 17.4-37.3c4.2-19.3 5.9-45 5.9-79.4s-1.8-60.1-5.9-79.4c-4.1-19-10.1-30.1-17.4-37.3s-18.3-13.3-37.3-17.4c-19.3-4.2-45-5.9-79.4-5.9l-56 0c-34.4 0-60.1 1.8-79.4 5.9-19 4.1-30.1 10.1-37.3 17.4s-13.3 18.3-17.4 37.3z"/></svg>`;
 const SVG_CLOSED_LABEL = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 560" class="forgejo-icon"><path fill="currentColor" d="M258.8 380c-3.9 3.1-6.7 7.6-6.7 12.6l0 27.4c0 15.5-12.5 28-28 28s-28-12.5-28-28l0-27.4c0-5-2.8-9.5-6.7-12.6-13-10.3-21.3-26.1-21.3-44 0-30.9 25.1-56 56-56s56 25.1 56 56c0 17.8-8.3 33.7-21.3 44zM84.2 140l0 40.9c-16.9 5.9-31.9 14.4-44.3 26.8-17.3 17.3-27 39.5-32.5 65.1-9.8 45.4-9.8 137 0 182.4 5.5 25.6 15.2 47.8 32.5 65.1s39.5 27 65.1 32.5c25.3 5.5 55.7 7.2 91.2 7.2l56 0c35.6 0 65.9-1.7 91.2-7.2 25.6-5.5 47.8-15.2 65.1-32.5s27-39.5 32.5-65.1c9.8-45.4 9.8-137 0-182.4-5.5-25.6-15.2-47.8-32.5-65.1-12.4-12.4-27.4-20.9-44.3-26.8l0-40.9c0-40.3-12.9-75.9-38.5-101.5S264.4 0 224.2 0 148.3 12.9 122.7 38.5 84.2 99.7 84.2 140zm78.1-61.9C175.6 64.8 196 56 224.2 56s48.6 8.8 61.9 22.1 22.1 33.7 22.1 61.9l0 30.1c-17-1.5-35.6-2.1-56-2.1l-56 0c-20.4 0-39 .6-56 2.1l0-30.1c0-28.2 8.8-48.6 22.1-61.9zM62.1 284.6c4.1-19 10.1-30.1 17.4-37.3s18.3-13.3 37.3-17.4c19.3-4.2 45-5.9 79.4-5.9l56 0c34.4 0 60.1 1.8 79.4 5.9 19 4.1 30.1 10.1 37.3 17.4s13.3 18.3 17.4 37.3c4.2 19.3 5.9 45 5.9 79.4s-1.8 60.1-5.9 79.4c-4.1-19-10.1-30.1-17.4-37.3s-18.3 13.3-37.3 17.4c-19.3-4.2-45-5.9-79.4-5.9l-56 0c-34.4 0-60.1-1.8-79.4-5.9-19-4.1-30.1-10.1-37.3-17.4s-13.3-18.3-17.4-37.3c-4.2-19.3-5.9-45-5.9-79.4s1.8-60.1 5.9-79.4z"/></svg>`;
 
-// Helper function against XSS: Sanitize String inputs
 function escapeHtml(str: string): string {
   if (!str) return "";
   return str
@@ -212,7 +225,6 @@ function escapeHtml(str: string): string {
     .replace(/'/g, "&#039;");
 }
 
-// Helper to validate safe URLs (preventing javascript: or arbitrary origins)
 function sanitizeUrl(rawUrl: string, expectedHostUrl?: string): string {
   try {
     const url = new URL(rawUrl);
@@ -301,6 +313,16 @@ export default class ForgejoPlugin extends Plugin {
     this.registerMarkdownCodeBlockProcessor("FR-ALL", (source, el) =>
       this.renderAllUserRepos(el),
     );
+
+    this.registerMarkdownCodeBlockProcessor("FRA", (source, el) =>
+      this.renderActivityHeatmap(source.trim(), el, 6),
+    );
+
+    for (let m = 1; m <= 12; m++) {
+      this.registerMarkdownCodeBlockProcessor(`FRA-${m}`, (source, el) =>
+        this.renderActivityHeatmap(source.trim(), el, m),
+      );
+    }
 
     this.startAutoRefresh();
   }
@@ -493,6 +515,15 @@ export default class ForgejoPlugin extends Plugin {
       .forgejo-sortable-th:hover { opacity: 0.85; }
       .forgejo-th-content { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
       .forgejo-sort-icon { width: 14px; height: 14px; fill: currentColor; display: inline-block; opacity: 0.6; flex-shrink: 0; }
+
+      /* Activity Heatmap Styling */
+      .forgejo-heatmap-wrap { width: 100%; overflow-x: auto; font-family: var(--font-interface); font-size: 12px; color: var(--text-normal); }
+      .forgejo-heatmap-svg { display: block; margin: 0 auto; }
+      .forgejo-heatmap-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; font-size: 12px; color: var(--text-muted); }
+      .forgejo-heatmap-legend { display: flex; align-items: center; gap: 4px; }
+      
+      /* Duotone SVG Icon styling for heatmap */
+      .forgejo-duotone-icon { width: 11px; height: 11px; display: inline-block; vertical-align: middle; flex-shrink: 0; }
     `;
   }
 
@@ -500,7 +531,6 @@ export default class ForgejoPlugin extends Plugin {
     const data = await this.loadData();
     this.settings = Object.assign({}, DEFAULT_SETTINGS, data);
 
-    // Unobfuscate stored Token from storage
     if (
       this.settings.apiToken &&
       this.settings.apiToken.startsWith("enc_b64:")
@@ -516,7 +546,6 @@ export default class ForgejoPlugin extends Plugin {
   }
 
   async saveSettings() {
-    // Obfuscate token before saving to data.json
     const rawToken = this.settings.apiToken;
     const settingsToSave = Object.assign({}, this.settings);
     if (rawToken) {
@@ -571,7 +600,6 @@ export default class ForgejoPlugin extends Plugin {
 
       const url = new URL(cleanUrl);
 
-      // Strict origin validation against configured server URL
       const configuredUrl = new URL(this.settings.serverUrl);
       if (url.origin !== configuredUrl.origin) {
         return null;
@@ -604,7 +632,6 @@ export default class ForgejoPlugin extends Plugin {
     if (!this.settings.serverUrl) throw new Error("Server URL not set");
     const baseUrl = this.settings.serverUrl.replace(/\/$/, "");
 
-    // Strict URL construction and protocol enforcement
     const targetUrl = new URL(
       `${baseUrl}/api/v1/${endpoint.replace(/^\//, "")}`,
     );
@@ -1143,6 +1170,195 @@ export default class ForgejoPlugin extends Plugin {
     }
   }
 
+  async renderActivityHeatmap(
+    username: string,
+    el: HTMLElement,
+    monthsCount: number,
+  ) {
+    el.empty();
+    const container = el.createDiv({ cls: "forgejo-container" });
+    if (!this.settings.apiToken || !this.settings.serverUrl) {
+      container.createEl("p", {
+        text: this.t("configWarning"),
+        cls: "mod-warning",
+      });
+      return;
+    }
+
+    const cleanUser = username.replace(/[\[\]'"]/g, "").trim();
+    if (!cleanUser) {
+      container.createEl("p", {
+        text: this.t("invalidUsername"),
+        cls: "mod-warning",
+      });
+      return;
+    }
+
+    container.createEl("span", { text: this.t("loading") });
+
+    try {
+      const endpoint = `users/${encodeURIComponent(cleanUser)}/heatmap`;
+      const heatmapData = await this.fetchApi<HeatmapDay[]>(endpoint);
+      container.empty();
+
+      const months = Math.min(Math.max(monthsCount, 1), 12);
+      const activityMap = new Map<string, number>();
+
+      if (Array.isArray(heatmapData)) {
+        heatmapData.forEach((item) => {
+          const d = new Date(item.timestamp * 1000);
+          const key = d.toISOString().substring(0, 10);
+          activityMap.set(key, item.contributions);
+        });
+      }
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const startDate = new Date(today);
+      startDate.setMonth(today.getMonth() - months);
+      
+      const dayOfWeek = (startDate.getDay() + 6) % 7;
+      startDate.setDate(startDate.getDate() - dayOfWeek);
+
+      const weeks: { date: Date; key: string; count: number }[][] = [];
+      let currentWeek: { date: Date; key: string; count: number }[] = [];
+      let curr = new Date(startDate);
+      let totalContributions = 0;
+
+      while (curr <= today || currentWeek.length > 0) {
+        const key = curr.toISOString().substring(0, 10);
+        const count = activityMap.get(key) || 0;
+
+        if (curr <= today) {
+          totalContributions += count;
+        }
+
+        currentWeek.push({ date: new Date(curr), key, count: curr <= today ? count : 0 });
+
+        if (currentWeek.length === 7) {
+          weeks.push(currentWeek);
+          currentWeek = [];
+          if (curr > today) break;
+        }
+        curr.setDate(curr.getDate() + 1);
+      }
+
+      const getForgejoColor = (cnt: number) => {
+        if (cnt <= 0) return "#ebedf0";
+        if (cnt <= 3) return "#ffd8b3";
+        if (cnt <= 6) return "#ff9838";
+        if (cnt <= 10) return "#d64000";
+        return "#7a1a00";
+      };
+
+      const duotoneSvg = (color: string) =>
+        `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="11" height="11" class="forgejo-duotone-icon" style="color: ${color};"><path opacity=".4" fill="currentColor" d="M16 96l0 320c0 26.5 21.5 48 48 48l320 0c26.5 0 48-21.5 48-48l0-320c0-26.5-21.5-48-48-48L64 48C37.5 48 16 69.5 16 96z"/><path fill="currentColor" d="M384 48c26.5 0 48 21.5 48 48l0 320c0 26.5-21.5 48-48 48L64 464c-26.5 0-48-21.5-48-48L16 96c0-26.5 21.5-48 48-48l320 0zM64 32C28.7 32 0 60.7 0 96L0 416c0 35.3 28.7 64 64 64l320 0c35.3 0 64-28.7 64-64l0-320c0-35.3-28.7-64-64-64L64 32z"/></svg>`;
+
+      const boxSize = 11;
+      const boxGap = 3;
+      const leftOffset = 28;
+      const topOffset = 20;
+      const svgWidth = leftOffset + weeks.length * (boxSize + boxGap);
+      const svgHeight = topOffset + 7 * (boxSize + boxGap);
+
+      let svgContent = `<svg class="forgejo-heatmap-svg" viewBox="0 0 ${svgWidth} ${svgHeight}" width="${svgWidth}" height="${svgHeight}">`;
+
+      const monthNamesDe = [
+        "Jan",
+        "Feb",
+        "Mär",
+        "Apr",
+        "Mai",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Okt",
+        "Nov",
+        "Dez",
+      ];
+      const monthNamesEn = [
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec",
+      ];
+      const monthNames =
+        this.settings.language === "de" ? monthNamesDe : monthNamesEn;
+
+      let lastMonth = -1;
+      weeks.forEach((w, wIdx) => {
+        const firstDayOfWeek = w[0].date;
+        const m = firstDayOfWeek.getMonth();
+        if (m !== lastMonth) {
+          const x = leftOffset + wIdx * (boxSize + boxGap);
+          svgContent += `<text x="${x}" y="12" fill="var(--text-muted)" font-size="10">${monthNames[m]}</text>`;
+          lastMonth = m;
+        }
+      });
+
+      const dayLabels =
+        this.settings.language === "de"
+          ? ["Mo", "", "Mi", "", "Fr", "", ""]
+          : ["Mon", "", "Wed", "", "Fri", "", ""];
+      dayLabels.forEach((lbl, idx) => {
+        if (lbl) {
+          const y = topOffset + idx * (boxSize + boxGap) + 9;
+          svgContent += `<text x="0" y="${y}" fill="var(--text-muted)" font-size="10">${lbl}</text>`;
+        }
+      });
+
+      weeks.forEach((w, wIdx) => {
+        w.forEach((d) => {
+          const dayIdx = (d.date.getDay() + 6) % 7;
+          const x = leftOffset + wIdx * (boxSize + boxGap);
+          const y = topOffset + dayIdx * (boxSize + boxGap);
+          const color = getForgejoColor(d.count);
+
+          svgContent += `<g transform="translate(${x}, ${y})">${duotoneSvg(color)}<title>${d.key}: ${d.count} ${this.t("contributions").toLowerCase()}</title></g>`;
+        });
+      });
+
+      svgContent += `</svg>`;
+
+      const formattedTotal = totalContributions.toLocaleString(
+        this.settings.language === "de" ? "de-DE" : "en-US",
+      );
+
+      const heatmapWrap = container.createDiv({ cls: "forgejo-heatmap-wrap" });
+      heatmapWrap.innerHTML = `
+        ${svgContent}
+        <div class="forgejo-heatmap-footer">
+          <div>${formattedTotal} ${this.t("contributions")} ${months} ${months === 1 ? (this.settings.language === "de" ? "Monat" : "month") : (this.settings.language === "de" ? "Monaten" : "months")}</div>
+          <div class="forgejo-heatmap-legend">
+            <span>${this.t("less")}</span>
+            ${duotoneSvg("#ebedf0")}
+            ${duotoneSvg("#ffd8b3")}
+            ${duotoneSvg("#ff9838")}
+            ${duotoneSvg("#d64000")}
+            ${duotoneSvg("#7a1a00")}
+            <span>${this.t("more")}</span>
+          </div>
+        </div>
+      `;
+    } catch (err) {
+      container.empty();
+      container.createEl("p", {
+        text: `${this.t("fetchError")}: ${escapeHtml(err instanceof Error ? err.message : String(err))}`,
+        cls: "mod-warning",
+      });
+    }
+  }
+
   private stripHtml(html: string): string {
     const tmp = document.createElement("DIV");
     tmp.textContent = html;
@@ -1257,11 +1473,7 @@ export default class ForgejoPlugin extends Plugin {
               }
 
               const parseCustomDate = (str: string): number => {
-                if (
-                  !str ||
-                  str === "N/A" ||
-                  str === this.t("none")
-                )
+                if (!str || str === "N/A" || str === this.t("none"))
                   return 0;
 
                 const deMatch = str.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/);
@@ -1414,15 +1626,18 @@ class ForgejoSettingTab extends PluginSettingTab {
     list.createEl("li", {
       text: "All Repositories Overview: ```FR-ALL (No URL needed)",
     });
+    list.createEl("li", {
+      text: "Activity Heatmap: ```FRA (Default 6 Mo) oder ```FRA-1 bis ```FRA-12 + Username",
+    });
 
     new Setting(containerEl)
       .setName("Forgejo Server URL")
       .setDesc(
-        "Base URL of your Forgejo instance (e.g. https://my-forgejo-instance.com)",
+        "Base URL of your Forgejo instance (e.g. [https://my-forgejo-instance.com](https://my-forgejo-instance.com))",
       )
       .addText((text) =>
         text
-          .setPlaceholder("https://my-forgejo-instance.com")
+          .setPlaceholder("[https://my-forgejo-instance.com](https://my-forgejo-instance.com)")
           .setValue(this.plugin.settings.serverUrl)
           .onChange(async (value) => {
             this.plugin.settings.serverUrl = value.trim();
@@ -1583,7 +1798,6 @@ class ForgejoSettingTab extends PluginSettingTab {
       text: "If you like this plugin, consider supporting its development:",
     });
 
-    // Wrapper für die Links mit Flexbox & Abständen (gap)
     const badgeContainer = supportContainer.createDiv({
       attr: {
         style:
