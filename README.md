@@ -118,6 +118,17 @@ https://forgejo.yourdomain.com/owner/repo
 ```
 ```` 
 
+### 6. User Heatmap
+
+Generates an overview of a user's recent activities. The number following FRA specifies the number of months to display; if no number is specified, the last 6 months are shown.
+
+````markdown
+```FRA-12
+owner
+```
+````
+
+
 ## 🎨 Codeblock Syntax Quick Reference
 
 | **Codeblock**               | **Scope**    | **Argument** | **Description**                                |
@@ -134,7 +145,8 @@ https://forgejo.yourdomain.com/owner/repo
 | `FPR-LIST-OPEN`             | User PRs     | Username     | Lists open PRs authored by user                |
 | `FPR-LIST-CLOSED`           | User PRs     | Username     | Lists closed PRs authored by user              |
 | `FR`                        | Repository   | Repo URL     | Displays single repo summary & metrics         |
-| `FR-ALL`                     | All Repos    | *None*       | Overview table of all authenticated user repos |
+| `FR-ALL`                    | All Repos    | *None*       | Overview table of all authenticated user repos |
+| `FRA-6`                     | User Heatmap | Username     | Displays a table of recent activities          |
 
 ## ☕ Support & Donation
 
