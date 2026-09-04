@@ -1633,11 +1633,11 @@ class ForgejoSettingTab extends PluginSettingTab {
     new Setting(containerEl)
       .setName("Forgejo Server URL")
       .setDesc(
-        "Base URL of your Forgejo instance (e.g. [https://my-forgejo-instance.com](https://my-forgejo-instance.com))",
+        "Base URL of your Forgejo instance (e.g. https://my-forgejo-instance.com",
       )
       .addText((text) =>
         text
-          .setPlaceholder("[https://my-forgejo-instance.com](https://my-forgejo-instance.com)")
+          .setPlaceholder("https://my-forgejo-instance.com")
           .setValue(this.plugin.settings.serverUrl)
           .onChange(async (value) => {
             this.plugin.settings.serverUrl = value.trim();
