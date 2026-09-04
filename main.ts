@@ -517,9 +517,9 @@ export default class ForgejoPlugin extends Plugin {
       .forgejo-sort-icon { width: 14px; height: 14px; fill: currentColor; display: inline-block; opacity: 0.6; flex-shrink: 0; }
 
       /* Activity Heatmap Styling */
-      .forgejo-heatmap-wrap { width: 100%; overflow-x: auto; font-family: var(--font-interface); font-size: 12px; color: var(--text-normal); }
+      .forgejo-heatmap-wrap { width: 100%; overflow-x: auto; font-family: var(--font-interface); font-size: 12px; }
       .forgejo-heatmap-svg { display: block; margin: 0 auto; }
-      .forgejo-heatmap-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; font-size: 12px; color: var(--text-muted); }
+      .forgejo-heatmap-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; font-size: 12px; }
       .forgejo-heatmap-legend { display: flex; align-items: center; gap: 4px; }
       
       /* Duotone SVG Icon styling for heatmap */
@@ -1245,7 +1245,7 @@ export default class ForgejoPlugin extends Plugin {
       }
 
       const getForgejoColor = (cnt: number) => {
-        if (cnt <= 0) return "#ebedf0";
+        if (cnt <= 0) return "#d6d7d8";
         if (cnt <= 3) return "#ffd8b3";
         if (cnt <= 6) return "#ff9838";
         if (cnt <= 10) return "#d64000";
@@ -1341,7 +1341,7 @@ export default class ForgejoPlugin extends Plugin {
           <div>${formattedTotal} ${this.t("contributions")} ${months} ${months === 1 ? (this.settings.language === "de" ? "Monat" : "month") : (this.settings.language === "de" ? "Monaten" : "months")}</div>
           <div class="forgejo-heatmap-legend">
             <span>${this.t("less")}</span>
-            ${duotoneSvg("#ebedf0")}
+            ${duotoneSvg("#d6d7d8")}
             ${duotoneSvg("#ffd8b3")}
             ${duotoneSvg("#ff9838")}
             ${duotoneSvg("#d64000")}
