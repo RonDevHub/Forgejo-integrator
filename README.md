@@ -128,25 +128,34 @@ owner
 ```
 ````
 
+Generates an overview of the recent activities of a user and a repos. The number after FRA indicates the number of months to be reported; If no number is given, the last 6 months are displayed.
+
+````markdown
+```FRA-12
+owner/repo
+```
+````
+
 
 ## 🎨 Codeblock Syntax Quick Reference
 
-| **Codeblock**               | **Scope**    | **Argument** | **Description**                                |
-| --------------------------- | ------------ | ------------ | ---------------------------------------------- |
-| `FIS`                       | Single Issue | Issue URL    | Renders detailed view of a single issue        |
-| `FPR`                       | Single PR    | PR URL       | Renders detailed view of a single pull request |
-| `FIS-ALL` / `FRI`           | Issues       | Repo URL     | Lists all issues in a repository               |
-| `FIS-OPEN` / `FRI-OPEN`     | Issues       | Repo URL     | Lists open issues in a repository              |
-| `FIS-CLOSED` / `FRI-CLOSED` | Issues       | Repo URL     | Lists closed issues in a repository            |
-| `FPR-ALL`                   | PRs          | Repo URL     | Lists all pull requests in a repository        |
-| `FPR-OPEN`                  | PRs          | Repo URL     | Lists open pull requests in a repository       |
-| `FPR-CLOSED`                | PRs          | Repo URL     | Lists closed pull requests in a repository     |
-| `FPR-LIST`                  | User PRs     | Username     | Lists all PRs authored by user                 |
-| `FPR-LIST-OPEN`             | User PRs     | Username     | Lists open PRs authored by user                |
-| `FPR-LIST-CLOSED`           | User PRs     | Username     | Lists closed PRs authored by user              |
-| `FR`                        | Repository   | Repo URL     | Displays single repo summary & metrics         |
-| `FR-ALL`                    | All Repos    | *None*       | Overview table of all authenticated user repos |
-| `FRA-6`                     | User Heatmap | Username     | Displays a table of recent activities          |
+| **Codeblock**               | **Scope**    | **Argument** | **Description**                                   |
+| --------------------------- | ------------ | ------------ | ------------------------------------------------- |
+| `FIS`                       | Single Issue | Issue URL    | Renders detailed view of a single issue           |
+| `FPR`                       | Single PR    | PR URL       | Renders detailed view of a single pull request    |
+| `FIS-ALL` / `FRI`           | Issues       | Repo URL     | Lists all issues in a repository                  |
+| `FIS-OPEN` / `FRI-OPEN`     | Issues       | Repo URL     | Lists open issues in a repository                 |
+| `FIS-CLOSED` / `FRI-CLOSED` | Issues       | Repo URL     | Lists closed issues in a repository               |
+| `FPR-ALL`                   | PRs          | Repo URL     | Lists all pull requests in a repository           |
+| `FPR-OPEN`                  | PRs          | Repo URL     | Lists open pull requests in a repository          |
+| `FPR-CLOSED`                | PRs          | Repo URL     | Lists closed pull requests in a repository        |
+| `FPR-LIST`                  | User PRs     | Username     | Lists all PRs authored by user                    |
+| `FPR-LIST-OPEN`             | User PRs     | Username     | Lists open PRs authored by user                   |
+| `FPR-LIST-CLOSED`           | User PRs     | Username     | Lists closed PRs authored by user                 |
+| `FR`                        | Repository   | Repo URL     | Displays single repo summary & metrics            |
+| `FR-ALL`                    | All Repos    | *None*       | Overview table of all authenticated user repos    |
+| `FRA-6`                     | User Heatmap | Username     | Displays a table of recent activities             |
+| `FRA-6`                     | Repo Heatmap | Username/Repo| Displays a table of recent activities from a repo |
 
 ## ☕ Support & Donation
 
