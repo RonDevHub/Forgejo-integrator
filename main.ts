@@ -74,7 +74,7 @@ const TRANSLATIONS: Record<string, TranslationKeys> = {
     userReposOverview: "User Repositories Overview",
     configWarning: "⚠️ Please configure Server URL and API Token in settings.",
     invalidUrl: "❌ Invalid URL or unauthorized domain",
-    invalidUsername: "❌ Invalid Username specified.",
+    invalidUsername: "❌ Invalid Input specified.",
     fetchError: "Fetch error",
     contributions: "contributions in the last",
     less: "Less",
@@ -108,7 +108,7 @@ const TRANSLATIONS: Record<string, TranslationKeys> = {
     userReposOverview: "Benutzer-Repositories Übersicht",
     configWarning: "⚠️ Bitte Server-URL und API-Token in den Einstellungen konfigurieren.",
     invalidUrl: "❌ Ungültige URL oder nicht autorisierte Domain",
-    invalidUsername: "❌ Ungültiger Benutzername angegeben.",
+    invalidUsername: "❌ Ungültige Eingabe angegeben.",
     fetchError: "Fehler beim Abrufen",
     contributions: "Beiträge in den letzten",
     less: "Weniger",
@@ -199,6 +199,14 @@ interface ForgejoRepo {
   pushed_at?: string;
   updated?: string;
   open_issues_count: number;
+}
+
+interface ForgejoCommit {
+  commit: {
+    author: {
+      date: string;
+    };
+  };
 }
 
 interface HeatmapDay {
@@ -517,9 +525,9 @@ export default class ForgejoPlugin extends Plugin {
       .forgejo-sort-icon { width: 14px; height: 14px; fill: currentColor; display: inline-block; opacity: 0.6; flex-shrink: 0; }
 
       /* Activity Heatmap Styling */
-      .forgejo-heatmap-wrap { width: 100%; overflow-x: auto; font-family: var(--font-interface); font-size: 12px; }
+      .forgejo-heatmap-wrap { width: 100%; overflow-x: auto; font-family: var(--font-interface); font-size: 12px; color: var(--text-normal); }
       .forgejo-heatmap-svg { display: block; margin: 0 auto; }
-      .forgejo-heatmap-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; font-size: 12px; }
+      .forgejo-heatmap-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; font-size: 12px; color: var(--text-muted); }
       .forgejo-heatmap-legend { display: flex; align-items: center; gap: 4px; }
       
       /* Duotone SVG Icon styling for heatmap */
@@ -665,6 +673,47 @@ export default class ForgejoPlugin extends Plugin {
     }
 
     return data;
+  }
+
+  async fetchRepoHeatmapFromCommits(
+    owner: string,
+    repo: string,
+  ): Promise<HeatmapDay[]> {
+    const commitCounts: Record<string, number> = {};
+    let page = 1;
+    const limit = 50;
+    let hasMorePages = true;
+
+    while (hasMorePages) {
+      const endpoint = `repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/commits?limit=${limit}&page=${page}`;
+      const commits = await this.fetchApi<ForgejoCommit[]>(endpoint);
+
+      if (!commits || !Array.isArray(commits) || commits.length === 0) {
+        hasMorePages = false;
+        break;
+      }
+
+      for (const item of commits) {
+        if (item.commit?.author?.date) {
+          const dateKey = item.commit.author.date.split("T")[0];
+          commitCounts[dateKey] = (commitCounts[dateKey] || 0) + 1;
+        }
+      }
+
+      if (commits.length < limit) {
+        hasMorePages = false;
+      } else {
+        page++;
+      }
+    }
+
+    return Object.entries(commitCounts).map(([dateStr, count]) => {
+      const timestampInSeconds = Math.floor(new Date(dateStr).getTime() / 1000);
+      return {
+        timestamp: timestampInSeconds,
+        contributions: count,
+      };
+    });
   }
 
   async fetchRawFile(
@@ -1171,7 +1220,7 @@ export default class ForgejoPlugin extends Plugin {
   }
 
   async renderActivityHeatmap(
-    username: string,
+    input: string,
     el: HTMLElement,
     monthsCount: number,
   ) {
@@ -1185,8 +1234,8 @@ export default class ForgejoPlugin extends Plugin {
       return;
     }
 
-    const cleanUser = username.replace(/[\[\]'"]/g, "").trim();
-    if (!cleanUser) {
+    const cleanInput = input.replace(/[\[\]'"]/g, "").trim();
+    if (!cleanInput) {
       container.createEl("p", {
         text: this.t("invalidUsername"),
         cls: "mod-warning",
@@ -1197,8 +1246,25 @@ export default class ForgejoPlugin extends Plugin {
     container.createEl("span", { text: this.t("loading") });
 
     try {
-      const endpoint = `users/${encodeURIComponent(cleanUser)}/heatmap`;
-      const heatmapData = await this.fetchApi<HeatmapDay[]>(endpoint);
+      let heatmapData: HeatmapDay[] = [];
+      const parsed = this.parseUrl(input);
+
+      if (parsed) {
+        heatmapData = await this.fetchRepoHeatmapFromCommits(
+          parsed.owner,
+          parsed.repo,
+        );
+      } else if (cleanInput.includes("/")) {
+        const parts = cleanInput.split("/");
+        heatmapData = await this.fetchRepoHeatmapFromCommits(
+          parts[0],
+          parts[1],
+        );
+      } else {
+        const endpoint = `users/${encodeURIComponent(cleanInput)}/heatmap`;
+        heatmapData = await this.fetchApi<HeatmapDay[]>(endpoint);
+      }
+
       container.empty();
 
       const months = Math.min(Math.max(monthsCount, 1), 12);
@@ -1217,7 +1283,7 @@ export default class ForgejoPlugin extends Plugin {
 
       const startDate = new Date(today);
       startDate.setMonth(today.getMonth() - months);
-      
+
       const dayOfWeek = (startDate.getDay() + 6) % 7;
       startDate.setDate(startDate.getDate() - dayOfWeek);
 
@@ -1234,7 +1300,11 @@ export default class ForgejoPlugin extends Plugin {
           totalContributions += count;
         }
 
-        currentWeek.push({ date: new Date(curr), key, count: curr <= today ? count : 0 });
+        currentWeek.push({
+          date: new Date(curr),
+          key,
+          count: curr <= today ? count : 0,
+        });
 
         if (currentWeek.length === 7) {
           weeks.push(currentWeek);
@@ -1245,7 +1315,7 @@ export default class ForgejoPlugin extends Plugin {
       }
 
       const getForgejoColor = (cnt: number) => {
-        if (cnt <= 0) return "#d6d7d8";
+        if (cnt <= 0) return "#e6e7e9";
         if (cnt <= 3) return "#ffd8b3";
         if (cnt <= 6) return "#ff9838";
         if (cnt <= 10) return "#d64000";
@@ -1253,7 +1323,7 @@ export default class ForgejoPlugin extends Plugin {
       };
 
       const duotoneSvg = (color: string) =>
-        `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="11" height="11" class="forgejo-duotone-icon" style="color: ${color};"><path opacity=".4" fill="currentColor" d="M16 96l0 320c0 26.5 21.5 48 48 48l320 0c26.5 0 48-21.5 48-48l0-320c0-26.5-21.5-48-48-48L64 48C37.5 48 16 69.5 16 96z"/><path fill="currentColor" d="M384 48c26.5 0 48 21.5 48 48l0 320c0 26.5-21.5 48-48 48L64 464c-26.5 0-48-21.5-48-48L16 96c0-26.5 21.5-48 48-48l320 0zM64 32C28.7 32 0 60.7 0 96L0 416c0 35.3 28.7 64 64 64l320 0c35.3 0 64-28.7 64-64l0-320c0-35.3-28.7-64-64-64L64 32z"/></svg>`;
+        `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="11" height="11" class="forgejo-duotone-icon" style="color: ${color};"><path opacity=".4" fill="currentColor" d="M32 96l0 320c0 17.7 14.3 32 32 32l320 0c17.7 0 32-14.3 32-32l0-320c0-17.7-14.3-32-32-32L64 64C46.3 64 32 78.3 32 96z"/><path fill="currentColor" d="M384 64c17.7 0 32 14.3 32 32l0 320c0 17.7-14.3 32-32 32L64 448c-17.7 0-32-14.3-32-32L32 96c0-17.7 14.3-32 32-32l320 0zM64 32C28.7 32 0 60.7 0 96L0 416c0 35.3 28.7 64 64 64l320 0c35.3 0 64-28.7 64-64l0-320c0-35.3-28.7-64-64-64L64 32z"/></svg>`;
 
       const boxSize = 11;
       const boxGap = 3;
@@ -1341,7 +1411,7 @@ export default class ForgejoPlugin extends Plugin {
           <div>${formattedTotal} ${this.t("contributions")} ${months} ${months === 1 ? (this.settings.language === "de" ? "Monat" : "month") : (this.settings.language === "de" ? "Monaten" : "months")}</div>
           <div class="forgejo-heatmap-legend">
             <span>${this.t("less")}</span>
-            ${duotoneSvg("#d6d7d8")}
+            ${duotoneSvg("#e6e7e9")}
             ${duotoneSvg("#ffd8b3")}
             ${duotoneSvg("#ff9838")}
             ${duotoneSvg("#d64000")}
@@ -1627,13 +1697,13 @@ class ForgejoSettingTab extends PluginSettingTab {
       text: "All Repositories Overview: ```FR-ALL (No URL needed)",
     });
     list.createEl("li", {
-      text: "Activity Heatmap: ```FRA (Default 6 Mo) oder ```FRA-1 bis ```FRA-12 + Username",
+      text: "Activity Heatmap: ```FRA (Default 6 Mo) oder ```FRA-1 bis ```FRA-12 + Username/Repo",
     });
 
     new Setting(containerEl)
       .setName("Forgejo Server URL")
       .setDesc(
-        "Base URL of your Forgejo instance (e.g. https://my-forgejo-instance.com",
+        "Base URL of your Forgejo instance (e.g. https://my-forgejo-instance.com)",
       )
       .addText((text) =>
         text
