@@ -1697,7 +1697,10 @@ class ForgejoSettingTab extends PluginSettingTab {
       text: "All Repositories Overview: ```FR-ALL (No URL needed)",
     });
     list.createEl("li", {
-      text: "Activity Heatmap: ```FRA (Default 6 Mo) oder ```FRA-1 bis ```FRA-12 + Username/Repo",
+      text: "Activity Heatmap User: ```FRA (Default 6 Mo) or ```FRA-1 up to ```FRA-12 + Username",
+    });
+    list.createEl("li", {
+      text: "Activity Heatmap Repo: ```FRA (Default 6 Mo) or ```FRA-1 up to ```FRA-12 + Username/Repo",
     });
 
     new Setting(containerEl)
