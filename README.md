@@ -11,7 +11,7 @@ Track single issues, pull requests, repository overviews, and filtered lists in 
 - **Live Data Fetching**: Pulls real-time information directly from your self-hosted Forgejo/Gitea REST API.
 - **Interactive & Sortable Tables**: Sort lists dynamically by clicking on column headers (supports numeric, date, and alphabetical sorting).
 - **Multiple Markdown Code Blocks**: Embed individual items, repository lists, user-specific pull requests, or complete account overviews.
-- **Customizable Themes & Layouts**: Choose between 13 color themes (`dark`, `light`, `blue`, `purple`, `mono`, `sepia`, `nord`, `dracula`, `cyberpunk`, `midnight`, `slate`, `teal`, `amber`, `coffee`, `synthwave`, `solarized-dark`, `rose`, `emerald` ) and vertical/horizontal single-item views.
+- **Customizable Themes & Layouts**: Choose between 18 color themes (`dark`, `light`, `blue`, `purple`, `mono`, `sepia`, `nord`, `dracula`, `cyberpunk`, `midnight`, `slate`, `teal`, `amber`, `coffee`, `synthwave`, `solarized-dark`, `rose`, `emerald` ) and vertical/horizontal single-item views.
 - **Client-side Caching & Polling**: Reduce server load and API limits with built-in caching and configurable auto-refresh intervals.
 - **Security First**: Input sanitization against XSS and token obfuscation in plugin settings.
 
