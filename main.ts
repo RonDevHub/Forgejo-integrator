@@ -135,7 +135,9 @@ interface ForgejoSettings {
     | "midnight"
     | "slate"
     | "teal"
-    | "amber";
+    | "amber"
+    | "coffee"
+    | "synthwave";
   enableCache: boolean;
 }
 
@@ -499,6 +501,24 @@ export default class ForgejoPlugin extends Plugin {
         rowBgPrimary = "#ffffff";
         zebraBg = "#fffbeb";
         rowTextColor = "#451a03";
+        break;
+      case "coffee":
+        headerBg = "#3c2a21";
+        subHeaderBg = "#1a120b";
+        textHeader = "#e5e5e5";
+        borderCol = "#d5cea3";
+        rowBgPrimary = "#faf5ef";
+        zebraBg = "#f5ebd9";
+        rowTextColor = "#3c2a21";
+        break;
+      case "synthwave":
+        headerBg = "#241442";
+        subHeaderBg = "#3b1e54";
+        textHeader = "#f472b6";
+        borderCol = "#06b6d4";
+        rowBgPrimary = "#1a0b2e";
+        zebraBg = "#241442";
+        rowTextColor = "#38bdf8";
         break;
     }
 
@@ -1794,6 +1814,8 @@ class ForgejoSettingTab extends PluginSettingTab {
           .addOption("slate", "Slate")
           .addOption("teal", "Teal")
           .addOption("amber", "Amber")
+          .addOption("coffee", "Coffee")
+          .addOption("synthwave", "Synthwave")
           .setValue(this.plugin.settings.themeStyle)
           .onChange(async (value) => {
             this.plugin.settings.themeStyle = value as any;
