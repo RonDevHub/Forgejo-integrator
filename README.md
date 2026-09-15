@@ -11,7 +11,7 @@ Track single issues, pull requests, repository overviews, and filtered lists in 
 - **Live Data Fetching**: Pulls real-time information directly from your self-hosted Forgejo/Gitea REST API.
 - **Interactive & Sortable Tables**: Sort lists dynamically by clicking on column headers (supports numeric, date, and alphabetical sorting).
 - **Multiple Markdown Code Blocks**: Embed individual items, repository lists, user-specific pull requests, or complete account overviews.
-- **Customizable Themes & Layouts**: Choose between 13 color themes (`dark`, `light`, `blue`, `purple`, `mono`, `sepia`, `nord`, `dracula`, `cyberpunk`, `midnight`, `slate`, `teal`, `amber`) and vertical/horizontal single-item views.
+- **Customizable Themes & Layouts**: Choose between 18 color themes (`dark`, `light`, `blue`, `purple`, `mono`, `sepia`, `nord`, `dracula`, `cyberpunk`, `midnight`, `slate`, `teal`, `amber`, `coffee`, `synthwave`, `solarized-dark`, `rose`, `emerald` ) and vertical/horizontal single-item views.
 - **Client-side Caching & Polling**: Reduce server load and API limits with built-in caching and configurable auto-refresh intervals.
 - **Security First**: Input sanitization against XSS and token obfuscation in plugin settings.
 
@@ -36,8 +36,9 @@ Navigate to **Settings > Forgejo Integrator** to configure the plugin:
 3. **Table Theme**: Select a theme (`dark`, `light`, `blue`, `purple`, `mono`, `sepia`, `nord`, `dracula`, `cyberpunk`, `midnight`, `slate`, `teal`, `amber`).
 4. **Table Layout**: Toggle between `vertical` and `horizontal` presentation for single-item blocks.
 5. **Enable Caching**: Toggle local disk/memory caching to minimize network requests.
-6. **Refresh Interval**: Set auto-update frequency (Realtime, 1 min, 5 min, 30 min, 1 hr).
-7. **Test Connection**: Click the **Test Connection** button to verify your API credentials.
+6. **Display Language**: Select the output language for tables *(English/German)*
+7. **Refresh Interval**: Set auto-update frequency (Realtime, 1 min, 5 min, 30 min, 1 hr).
+8. **Test Connection**: Click the **Test Connection** button to verify your API credentials.
 
 ---
 
@@ -117,23 +118,44 @@ https://forgejo.yourdomain.com/owner/repo
 ```
 ```` 
 
+### 6. User Heatmap
+
+Generates an overview of a user's recent activities. The number following FRA specifies the number of months to display; if no number is specified, the last 6 months are shown.
+
+````markdown
+```FRA-12
+owner
+```
+````
+
+Generates an overview of the recent activities of a user and a repos. The number after FRA indicates the number of months to be reported; If no number is given, the last 6 months are displayed.
+
+````markdown
+```FRA-12
+owner/repo
+```
+````
+
+
 ## 🎨 Codeblock Syntax Quick Reference
 
-| **Codeblock**               | **Scope**    | **Argument** | **Description**                                |
-| --------------------------- | ------------ | ------------ | ---------------------------------------------- |
-| `FIS`                       | Single Issue | Issue URL    | Renders detailed view of a single issue        |
-| `FPR`                       | Single PR    | PR URL       | Renders detailed view of a single pull request |
-| `FIS-ALL` / `FRI`           | Issues       | Repo URL     | Lists all issues in a repository               |
-| `FIS-OPEN` / `FRI-OPEN`     | Issues       | Repo URL     | Lists open issues in a repository              |
-| `FIS-CLOSED` / `FRI-CLOSED` | Issues       | Repo URL     | Lists closed issues in a repository            |
-| `FPR-ALL`                   | PRs          | Repo URL     | Lists all pull requests in a repository        |
-| `FPR-OPEN`                  | PRs          | Repo URL     | Lists open pull requests in a repository       |
-| `FPR-CLOSED`                | PRs          | Repo URL     | Lists closed pull requests in a repository     |
-| `FPR-LIST`                  | User PRs     | Username     | Lists all PRs authored by user                 |
-| `FPR-LIST-OPEN`             | User PRs     | Username     | Lists open PRs authored by user                |
-| `FPR-LIST-CLOSED`           | User PRs     | Username     | Lists closed PRs authored by user              |
-| `FR`                        | Repository   | Repo URL     | Displays single repo summary & metrics         |
-| `FR-ALL`                     | All Repos    | *None*       | Overview table of all authenticated user repos |
+| **Codeblock**               | **Scope**    | **Argument** | **Description**                                   |
+| --------------------------- | ------------ | ------------ | ------------------------------------------------- |
+| `FIS`                       | Single Issue | Issue URL    | Renders detailed view of a single issue           |
+| `FPR`                       | Single PR    | PR URL       | Renders detailed view of a single pull request    |
+| `FIS-ALL` / `FRI`           | Issues       | Repo URL     | Lists all issues in a repository                  |
+| `FIS-OPEN` / `FRI-OPEN`     | Issues       | Repo URL     | Lists open issues in a repository                 |
+| `FIS-CLOSED` / `FRI-CLOSED` | Issues       | Repo URL     | Lists closed issues in a repository               |
+| `FPR-ALL`                   | PRs          | Repo URL     | Lists all pull requests in a repository           |
+| `FPR-OPEN`                  | PRs          | Repo URL     | Lists open pull requests in a repository          |
+| `FPR-CLOSED`                | PRs          | Repo URL     | Lists closed pull requests in a repository        |
+| `FPR-LIST`                  | User PRs     | Username     | Lists all PRs authored by user                    |
+| `FPR-LIST-OPEN`             | User PRs     | Username     | Lists open PRs authored by user                   |
+| `FPR-LIST-CLOSED`           | User PRs     | Username     | Lists closed PRs authored by user                 |
+| `FR`                        | Repository   | Repo URL     | Displays single repo summary & metrics            |
+| `FR-ALL`                    | All Repos    | *None*       | Overview table of all authenticated user repos    |
+| `FRA-6`                     | User Heatmap | Username     | Displays a table of recent activities             |
+| `FRA-6`                     | Repo Heatmap | Username/Repo| Displays a table of recent activities from a repo |
 
 ## ☕ Support & Donation
 
