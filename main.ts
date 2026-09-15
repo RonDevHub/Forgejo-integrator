@@ -137,7 +137,10 @@ interface ForgejoSettings {
     | "teal"
     | "amber"
     | "coffee"
-    | "synthwave";
+    | "synthwave"
+    | "solarized-dark"
+    | "rose"
+    | "emerald";
   enableCache: boolean;
 }
 
@@ -519,6 +522,33 @@ export default class ForgejoPlugin extends Plugin {
         rowBgPrimary = "#1a0b2e";
         zebraBg = "#241442";
         rowTextColor = "#38bdf8";
+        break;
+      case "solarized-dark":
+        headerBg = "#073642";
+        subHeaderBg = "#586e75";
+        textHeader = "#fdf6e3";
+        borderCol = "#2aa198";
+        rowBgPrimary = "#002b36";
+        zebraBg = "#073642";
+        rowTextColor = "#839496";
+        break;
+      case "rose":
+        headerBg = "#881337";
+        subHeaderBg = "#be123c";
+        textHeader = "#ffffff";
+        borderCol = "#f43f5e";
+        rowBgPrimary = "#ffffff";
+        zebraBg = "#fff1f2";
+        rowTextColor = "#4c0519";
+        break;
+      case "emerald":
+        headerBg = "#064e3b";
+        subHeaderBg = "#047857";
+        textHeader = "#ffffff";
+        borderCol = "#10b981";
+        rowBgPrimary = "#ffffff";
+        zebraBg = "#ecfdf5";
+        rowTextColor = "#064e3b";
         break;
     }
 
@@ -1816,6 +1846,9 @@ class ForgejoSettingTab extends PluginSettingTab {
           .addOption("amber", "Amber")
           .addOption("coffee", "Coffee")
           .addOption("synthwave", "Synthwave")
+          .addOption("solarized-dark", "Solarized Dark")
+          .addOption("rose", "Rose")
+          .addOption("emerald", "Emerald")
           .setValue(this.plugin.settings.themeStyle)
           .onChange(async (value) => {
             this.plugin.settings.themeStyle = value as any;
