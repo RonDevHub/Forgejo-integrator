@@ -8,7 +8,7 @@ import {
   Notice,
 } from "obsidian";
 
-type Language = "en" | "de" | string;
+type Language = "en" | "de";
 
 interface TranslationKeys {
   title: string;
@@ -270,7 +270,6 @@ export default class ForgejoPlugin extends Plugin {
     await this.loadSettings();
     this.cachePath = `${this.manifest.dir}/cache.json`;
     await this.loadCache();
-    this.injectStyles();
     this.addSettingTab(new ForgejoSettingTab(this.app, this));
 
     this.registerMarkdownCodeBlockProcessor("FPR", (source, el) =>
@@ -342,8 +341,6 @@ export default class ForgejoPlugin extends Plugin {
 
   onunload() {
     this.stopAutoRefresh();
-    const styleEl = document.getElementById("forgejo-plugin-styles");
-    if (styleEl) styleEl.remove();
   }
 
   async loadCache() {
@@ -368,16 +365,7 @@ export default class ForgejoPlugin extends Plugin {
     }
   }
 
-  injectStyles() {
-    let styleEl = document.getElementById(
-      "forgejo-plugin-styles",
-    ) as HTMLStyleElement;
-    if (!styleEl) {
-      styleEl = document.createElement("style");
-      styleEl.id = "forgejo-plugin-styles";
-      document.head.appendChild(styleEl);
-    }
-
+  private getThemeCssVars() {
     let headerBg =
       "var(--background-secondary-alt, var(--background-secondary))";
     let subHeaderBg = "var(--background-secondary)";
@@ -552,37 +540,27 @@ export default class ForgejoPlugin extends Plugin {
         break;
     }
 
-    styleEl.textContent = `
-      .forgejo-container { margin: 14px 0; overflow-x: auto; font-family: var(--font-interface); }
-      .forgejo-table { width: 100%; border-collapse: collapse; margin: 6px 0; border: 1px solid ${borderCol} !important; background-color: ${rowBgPrimary} !important; font-size: 0.88em; border-radius: 4px; overflow: hidden; }
-      .forgejo-table th { border: 1px solid ${borderCol} !important; padding: 8px 12px; text-align: left; vertical-align: middle; color: ${textHeader} !important; }
-      .forgejo-table td { border: 1px solid ${borderCol} !important; padding: 8px 12px; text-align: left; vertical-align: middle; color: ${rowTextColor} !important; }
-      .forgejo-main-header { background-color: ${headerBg} !important; font-size: 1.05em; font-weight: bold; padding: 10px; text-align: center !important; color: ${textHeader} !important; }
-      .forgejo-cols-row th { background-color: ${subHeaderBg} !important; font-weight: 600; color: ${textHeader} !important; text-align: left; }
-      .forgejo-table tbody tr { background-color: ${rowBgPrimary} !important; }
-      .forgejo-table tbody tr:nth-child(even) { background-color: ${zebraBg} !important; }
-      .forgejo-fallback-cell { text-align: center !important; font-style: italic; color: var(--text-muted) !important; padding: 16px !important; }
-      .forgejo-user { display: inline-flex; align-items: center; gap: 8px; }
-      .forgejo-avatar { width: 20px; height: 20px; border-radius: 50%; object-fit: cover; }
-      .forgejo-badge { display: inline-block; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 0.8em; text-align: center; }
-      .forgejo-badge-open { background-color: #22c55e22; color: #22c55e !important; border: 1px solid #22c55e; }
-      .forgejo-badge-closed { background-color: #ef444422; color: #ef4444 !important; border: 1px solid #ef4444; }
-      .forgejo-icon { width: 14px; height: 14px; fill: currentColor; display: inline-block; flex-shrink: 0; }
-      .forgejo-inline-icon { display: inline-flex; align-items: center; gap: 6px; }
-      .forgejo-sortable-th { cursor: pointer; user-select: none; }
-      .forgejo-sortable-th:hover { opacity: 0.85; }
-      .forgejo-th-content { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
-      .forgejo-sort-icon { width: 14px; height: 14px; fill: currentColor; display: inline-block; opacity: 0.6; flex-shrink: 0; }
+    return {
+      "--forgejo-header-bg": headerBg,
+      "--forgejo-subheader-bg": subHeaderBg,
+      "--forgejo-text-header": textHeader,
+      "--forgejo-border-col": borderCol,
+      "--forgejo-row-bg": rowBgPrimary,
+      "--forgejo-zebra-bg": zebraBg,
+      "--forgejo-row-text": rowTextColor,
+    };
+  }
 
-      /* Activity Heatmap Styling */
-      .forgejo-heatmap-wrap { width: 100%; overflow-x: auto; font-family: var(--font-interface); font-size: 12px; color: var(--text-normal); }
-      .forgejo-heatmap-svg { display: block; margin: 0 auto; }
-      .forgejo-heatmap-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; font-size: 12px; color: var(--text-muted); }
-      .forgejo-heatmap-legend { display: flex; align-items: center; gap: 4px; }
-      
-      /* Duotone SVG Icon styling for heatmap */
-      .forgejo-duotone-icon { width: 11px; height: 11px; display: inline-block; vertical-align: middle; flex-shrink: 0; }
-    `;
+  private applyThemeStyles(element: HTMLElement) {
+    element.setCssStyles(this.getThemeCssVars());
+  }
+
+  private appendMarkup(container: HTMLElement, markup: string) {
+    if (!markup) return;
+    const doc = new DOMParser().parseFromString(markup, "text/html");
+    const fragment = document.createDocumentFragment();
+    Array.from(doc.body.childNodes).forEach((node) => fragment.appendChild(node.cloneNode(true)));
+    container.appendChild(fragment);
   }
 
   async loadSettings() {
@@ -611,7 +589,7 @@ export default class ForgejoPlugin extends Plugin {
     }
 
     await this.saveData(settingsToSave);
-    this.injectStyles();
+    this.app.workspace.containerEl?.setCssStyles(this.getThemeCssVars());
     this.startAutoRefresh();
     this.refreshViews();
   }
@@ -1455,8 +1433,9 @@ export default class ForgejoPlugin extends Plugin {
       );
 
       const heatmapWrap = container.createDiv({ cls: "forgejo-heatmap-wrap" });
-      heatmapWrap.innerHTML = `
-        ${svgContent}
+      this.appendMarkup(
+        heatmapWrap,
+        `${svgContent}
         <div class="forgejo-heatmap-footer">
           <div>${formattedTotal} ${this.t("contributions")} ${months} ${months === 1 ? (this.settings.language === "de" ? "Monat" : "month") : (this.settings.language === "de" ? "Monaten" : "months")}</div>
           <div class="forgejo-heatmap-legend">
@@ -1468,8 +1447,8 @@ export default class ForgejoPlugin extends Plugin {
             ${duotoneSvg("#7a1a00")}
             <span>${this.t("more")}</span>
           </div>
-        </div>
-      `;
+        </div>`,
+      );
     } catch (err) {
       container.empty();
       container.createEl("p", {
@@ -1497,6 +1476,7 @@ export default class ForgejoPlugin extends Plugin {
     let sortAscending = true;
 
     const table = parent.createEl("table", { cls: "forgejo-table" });
+    this.applyThemeStyles(table);
     const thead = table.createEl("thead");
 
     const titleRow = thead.createEl("tr", { cls: "forgejo-title-row" });
@@ -1532,7 +1512,7 @@ export default class ForgejoPlugin extends Plugin {
             cell.includes("<img ") ||
             cell.includes("<svg ")
           ) {
-            td.innerHTML = cell;
+            this.appendMarkup(td, cell);
           } else {
             td.textContent = cell;
           }
@@ -1557,15 +1537,18 @@ export default class ForgejoPlugin extends Plugin {
 
           const iconContainer = wrapper.createSpan();
           if (sortColumnIndex === index) {
-            iconContainer.innerHTML = sortAscending
-              ? SVG_SORT_ASC
-              : SVG_SORT_DESC;
-          } else {
-            iconContainer.innerHTML = SVG_SORT_ASC;
-            (iconContainer.firstChild as HTMLElement)?.setAttribute(
-              "style",
-              "opacity: 0.2;",
+            iconContainer.empty();
+            this.appendMarkup(
+              iconContainer,
+              sortAscending ? SVG_SORT_ASC : SVG_SORT_DESC,
             );
+          } else {
+            iconContainer.empty();
+            this.appendMarkup(iconContainer, SVG_SORT_ASC);
+            const sortIcon = iconContainer.firstElementChild as HTMLElement | null;
+            if (sortIcon) {
+              sortIcon.addClass("forgejo-sort-icon-muted");
+            }
           }
 
           th.addEventListener("click", () => {
@@ -1646,6 +1629,7 @@ export default class ForgejoPlugin extends Plugin {
     rows: [string, string][],
   ) {
     const table = parent.createEl("table", { cls: "forgejo-table" });
+    this.applyThemeStyles(table);
     const thead = table.createEl("thead");
 
     if (this.settings.tableLayout === "vertical") {
@@ -1659,7 +1643,7 @@ export default class ForgejoPlugin extends Plugin {
         const tr = tbody.createEl("tr");
         tr.createEl("td", {
           text: key,
-          attr: { style: "font-weight: bold; width: 30%;" },
+          cls: "forgejo-key-cell",
         });
         const tdVal = tr.createEl("td");
         if (
@@ -1669,7 +1653,7 @@ export default class ForgejoPlugin extends Plugin {
           val.includes("<img ") ||
           val.includes("<svg ")
         )
-          tdVal.innerHTML = val;
+          this.appendMarkup(tdVal, val);
         else tdVal.textContent = val;
       }
     } else {
@@ -1696,7 +1680,7 @@ export default class ForgejoPlugin extends Plugin {
           val.includes("<img ") ||
           val.includes("<svg ")
         )
-          tdVal.innerHTML = val;
+          this.appendMarkup(tdVal, val);
         else tdVal.textContent = val;
       }
     }
@@ -1715,19 +1699,10 @@ class ForgejoSettingTab extends PluginSettingTab {
     const { containerEl } = this;
     containerEl.empty();
 
-    containerEl.createEl("h2", { text: "Forgejo Integrator Settings" });
+    new Setting(containerEl).setName("Forgejo Integrator Settings").setHeading();
 
-    const infoBox = containerEl.createDiv({
-      cls: "forgejo-info-box",
-      attr: {
-        style:
-          "margin-bottom: 20px; padding: 12px; background-color: var(--background-secondary); border-radius: 6px;",
-      },
-    });
-    infoBox.createEl("h3", {
-      text: "Available Codeblocks",
-      attr: { style: "margin-top: 0;" },
-    });
+    const infoBox = containerEl.createDiv({ cls: "forgejo-settings-info" });
+    new Setting(containerEl).setName("Available Codeblocks").setHeading();
     const list = infoBox.createEl("ul");
     list.createEl("li", { text: "Single Items: ```FIS or ```FPR + Item URL" });
     list.createEl("li", {
@@ -1791,7 +1766,7 @@ class ForgejoSettingTab extends PluginSettingTab {
           .addOption("de", "Deutsch")
           .setValue(this.plugin.settings.language || "en")
           .onChange(async (value) => {
-            this.plugin.settings.language = value;
+            this.plugin.settings.language = value as Language;
             await this.plugin.saveSettings();
           }),
       );
@@ -1879,10 +1854,7 @@ class ForgejoSettingTab extends PluginSettingTab {
       .setName("Test Connection")
       .setDesc("Verify instance URL reachability and API Token validity.");
 
-    const statusContainer = containerEl.createDiv({
-      cls: "forgejo-test-status",
-      attr: { style: "margin-top: 8px;" },
-    });
+    const statusContainer = containerEl.createDiv({ cls: "forgejo-test-status" });
 
     testSetting.addButton((button) =>
       button
@@ -1897,29 +1869,26 @@ class ForgejoSettingTab extends PluginSettingTab {
           try {
             const user = await this.plugin.fetchApi<ForgejoUser>("user");
             statusContainer.empty();
-            statusContainer.createEl("div", {
+            const success = statusContainer.createDiv({
               text: `✅ Connection successful! Authenticated as: ${user.login} (${user.full_name || "No full name"})`,
-              attr: { style: "color: var(--text-success); font-weight: bold;" },
             });
+            success.addClass("forgejo-status-success");
             new Notice("Forgejo connection successful!");
           } catch (err) {
             statusContainer.empty();
-            statusContainer.createEl("div", {
+            const failure = statusContainer.createDiv({
               text: `❌ Connection failed: ${err instanceof Error ? err.message : String(err)}`,
-              attr: { style: "color: var(--text-error); font-weight: bold;" },
             });
+            failure.addClass("forgejo-status-error");
             new Notice("Forgejo connection failed.");
           }
         }),
     );
 
-    containerEl.createEl("hr", { attr: { style: "margin: 20px 0;" } });
+    containerEl.createEl("hr", { cls: "forgejo-settings-divider" });
 
     const supportContainer = containerEl.createDiv({
-      attr: {
-        style:
-          "text-align: center; display: flex; flex-direction: column; align-items: center;",
-      },
+      cls: "forgejo-settings-support",
     });
 
     supportContainer.createEl("p", {
@@ -1927,10 +1896,7 @@ class ForgejoSettingTab extends PluginSettingTab {
     });
 
     const badgeContainer = supportContainer.createDiv({
-      attr: {
-        style:
-          "display: flex; gap: 12px; justify-content: center; align-items: center; flex-wrap: wrap;",
-      },
+      cls: "forgejo-settings-badges",
     });
 
     const paypalLink = badgeContainer.createEl("a", {
