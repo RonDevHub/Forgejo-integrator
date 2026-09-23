@@ -137,9 +137,19 @@ const DEFAULT_SETTINGS: ForgejoSettings = {
 interface CacheData {
   [endpoint: string]: {
     timestamp: number;
-    data: any;
+    data: unknown;
   };
 }
+
+type LeafMarkdownView = {
+  previewMode?: {
+    rerender: (force: boolean) => void;
+  };
+  editor?: {
+    setValue: (value: string) => void;
+    getValue: () => string;
+  };
+};
 
 interface ForgejoUser {
   login: string;
@@ -386,7 +396,7 @@ export default class ForgejoPlugin extends Plugin {
   refreshViews() {
     this.app.workspace.iterateAllLeaves((leaf) => {
       if (leaf.view && leaf.view.getViewType() === "markdown") {
-        const view = leaf.view as any;
+        const view = leaf.view as LeafMarkdownView;
         if (view.previewMode) {
           view.previewMode.rerender(true);
         }
@@ -746,7 +756,7 @@ export default class ForgejoPlugin extends Plugin {
           ? `repos/${parsed.owner}/${parsed.repo}/pulls?state=${state}`
           : `repos/${parsed.owner}/${parsed.repo}/issues?state=${state}`;
 
-      const items = await this.fetchApi<any[]>(endpoint);
+      const items = await this.fetchApi<Array<ForgejoPR | ForgejoIssue>>(endpoint);
       container.empty();
 
       const typeName = type === "pr" ? this.t("pullRequests") : this.t("issues");
@@ -820,10 +830,10 @@ export default class ForgejoPlugin extends Plugin {
 
     try {
       const endpoint = `repos/issues/search?state=${state}&type=pulls&created_by=${encodeURIComponent(cleanUser)}`;
-      const response = await this.fetchApi<any>(endpoint);
+      const response = await this.fetchApi<ForgejoPR[] | { data?: ForgejoPR[] }>(endpoint);
       const items: ForgejoPR[] = Array.isArray(response)
         ? response
-        : response.data || [];
+        : response.data ?? [];
 
       container.empty();
 
@@ -887,16 +897,16 @@ export default class ForgejoPlugin extends Plugin {
       );
       const [openIssues, closedIssues, openPRs, closedPRs, license] =
         await Promise.all([
-          this.fetchApi<any[]>(
+          this.fetchApi<ForgejoIssue[]>(
             `repos/${parsed.owner}/${parsed.repo}/issues?state=open`,
           ).catch(() => []),
-          this.fetchApi<any[]>(
+          this.fetchApi<ForgejoIssue[]>(
             `repos/${parsed.owner}/${parsed.repo}/issues?state=closed`,
           ).catch(() => []),
-          this.fetchApi<any[]>(
+          this.fetchApi<ForgejoPR[]>(
             `repos/${parsed.owner}/${parsed.repo}/pulls?state=open`,
           ).catch(() => []),
-          this.fetchApi<any[]>(
+          this.fetchApi<ForgejoPR[]>(
             `repos/${parsed.owner}/${parsed.repo}/pulls?state=closed`,
           ).catch(() => []),
           this.detectLicense(parsed.owner, parsed.repo),
@@ -985,16 +995,16 @@ export default class ForgejoPlugin extends Plugin {
         repos.map(async (repo) => {
           const [openI, closedI, openP, closedP, releases, license] =
             await Promise.all([
-              this.fetchApi<any[]>(
+              this.fetchApi<ForgejoIssue[]>(
                 `repos/${repo.owner.login}/${repo.name}/issues?state=open`,
               ).catch(() => []),
-              this.fetchApi<any[]>(
+              this.fetchApi<ForgejoIssue[]>(
                 `repos/${repo.owner.login}/${repo.name}/issues?state=closed`,
               ).catch(() => []),
-              this.fetchApi<any[]>(
+              this.fetchApi<ForgejoPR[]>(
                 `repos/${repo.owner.login}/${repo.name}/pulls?state=open`,
               ).catch(() => []),
-              this.fetchApi<any[]>(
+              this.fetchApi<ForgejoPR[]>(
                 `repos/${repo.owner.login}/${repo.name}/pulls?state=closed`,
               ).catch(() => []),
               this.fetchApi<ForgejoRelease[]>(
@@ -1486,10 +1496,10 @@ class ForgejoSettingTab extends PluginSettingTab {
     const { containerEl } = this;
     containerEl.empty();
 
-    new Setting(containerEl).setName("Forgejo Integrator Settings").setHeading();
+    new Setting(containerEl).setName("General").setHeading();
 
     const infoBox = containerEl.createDiv({ cls: "forgejo-settings-info" });
-    new Setting(containerEl).setName("Available Codeblocks").setHeading();
+    new Setting(containerEl).setName("Code blocks").setHeading();
     const list = infoBox.createEl("ul");
     list.createEl("li", { text: "Single Items: ```FIS or ```FPR + Item URL" });
     list.createEl("li", {
