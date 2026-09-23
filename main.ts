@@ -122,25 +122,6 @@ interface ForgejoSettings {
   language: Language;
   tableLayout: "vertical" | "horizontal";
   refreshInterval: number;
-  themeStyle:
-    | "dark"
-    | "light"
-    | "blue"
-    | "purple"
-    | "mono"
-    | "sepia"
-    | "nord"
-    | "dracula"
-    | "cyberpunk"
-    | "midnight"
-    | "slate"
-    | "teal"
-    | "amber"
-    | "coffee"
-    | "synthwave"
-    | "solarized-dark"
-    | "rose"
-    | "emerald";
   enableCache: boolean;
 }
 
@@ -150,7 +131,6 @@ const DEFAULT_SETTINGS: ForgejoSettings = {
   language: "en",
   tableLayout: "vertical",
   refreshInterval: 60000,
-  themeStyle: "light",
   enableCache: false,
 };
 
@@ -365,196 +345,6 @@ export default class ForgejoPlugin extends Plugin {
     }
   }
 
-  private getThemeCssVars() {
-    let headerBg =
-      "var(--background-secondary-alt, var(--background-secondary))";
-    let subHeaderBg = "var(--background-secondary)";
-    let textHeader = "var(--text-normal)";
-    let borderCol = "var(--table-border, var(--border-color, #444))";
-    let rowBgPrimary = "var(--background-primary)";
-    let zebraBg = "var(--background-secondary-alt)";
-    let rowTextColor = "var(--text-normal)";
-
-    switch (this.settings.themeStyle) {
-      case "dark":
-        headerBg = "#1e1e2e";
-        subHeaderBg = "#2d2d3d";
-        textHeader = "#cdd6f4";
-        borderCol = "#45475a";
-        rowBgPrimary = "#1e1e2e";
-        zebraBg = "#181825";
-        rowTextColor = "#cdd6f4";
-        break;
-      case "light":
-        headerBg = "#e6e9ef";
-        subHeaderBg = "#dce0e8";
-        textHeader = "#4c4f69";
-        borderCol = "#bcc0cc";
-        rowBgPrimary = "#ffffff";
-        zebraBg = "#f2f4f8";
-        rowTextColor = "#4c4f69";
-        break;
-      case "blue":
-        headerBg = "#1e3a8a";
-        subHeaderBg = "#1d4ed8";
-        textHeader = "#ffffff";
-        borderCol = "#3b82f6";
-        rowBgPrimary = "#ffffff";
-        zebraBg = "#eff6ff";
-        rowTextColor = "#1e293b";
-        break;
-      case "purple":
-        headerBg = "#581c87";
-        subHeaderBg = "#7e22ce";
-        textHeader = "#ffffff";
-        borderCol = "#a855f7";
-        rowBgPrimary = "#ffffff";
-        zebraBg = "#faf5ff";
-        rowTextColor = "#2e1065";
-        break;
-      case "mono":
-        headerBg = "#18181b";
-        subHeaderBg = "#27272a";
-        textHeader = "#ffffff";
-        borderCol = "#71717a";
-        rowBgPrimary = "#ffffff";
-        zebraBg = "#f4f4f5";
-        rowTextColor = "#18181b";
-        break;
-      case "sepia":
-        headerBg = "#78350f";
-        subHeaderBg = "#92400e";
-        textHeader = "#fff7ed";
-        borderCol = "#d97706";
-        rowBgPrimary = "#fffbeb";
-        zebraBg = "#fef3c7";
-        rowTextColor = "#451a03";
-        break;
-      case "nord":
-        headerBg = "#2e3440";
-        subHeaderBg = "#3b4252";
-        textHeader = "#eceff4";
-        borderCol = "#4c566a";
-        rowBgPrimary = "#eceff4";
-        zebraBg = "#e5e9f0";
-        rowTextColor = "#2e3440";
-        break;
-      case "dracula":
-        headerBg = "#282a36";
-        subHeaderBg = "#44475a";
-        textHeader = "#f8f8f2";
-        borderCol = "#6272a4";
-        rowBgPrimary = "#282a36";
-        zebraBg = "#21222c";
-        rowTextColor = "#f8f8f2";
-        break;
-      case "cyberpunk":
-        headerBg = "#18181b";
-        subHeaderBg = "#27272a";
-        textHeader = "#f0abfc";
-        borderCol = "#d946ef";
-        rowBgPrimary = "#09090b";
-        zebraBg = "#18181b";
-        rowTextColor = "#e879f9";
-        break;
-      case "midnight":
-        headerBg = "#0f172a";
-        subHeaderBg = "#1e293b";
-        textHeader = "#e2e8f0";
-        borderCol = "#334155";
-        rowBgPrimary = "#111827";
-        zebraBg = "#0f172a";
-        rowTextColor = "#e2e8f0";
-        break;
-      case "slate":
-        headerBg = "#1e293b";
-        subHeaderBg = "#334155";
-        textHeader = "#f8fafc";
-        borderCol = "#64748b";
-        rowBgPrimary = "#ffffff";
-        zebraBg = "#f8fafc";
-        rowTextColor = "#1e293b";
-        break;
-      case "teal":
-        headerBg = "#134e4a";
-        subHeaderBg = "#0f766e";
-        textHeader = "#ffffff";
-        borderCol = "#14b8a6";
-        rowBgPrimary = "#ffffff";
-        zebraBg = "#f0fdfa";
-        rowTextColor = "#134e4a";
-        break;
-      case "amber":
-        headerBg = "#92400e";
-        subHeaderBg = "#b45309";
-        textHeader = "#ffffff";
-        borderCol = "#f59e0b";
-        rowBgPrimary = "#ffffff";
-        zebraBg = "#fffbeb";
-        rowTextColor = "#451a03";
-        break;
-      case "coffee":
-        headerBg = "#3c2a21";
-        subHeaderBg = "#1a120b";
-        textHeader = "#e5e5e5";
-        borderCol = "#d5cea3";
-        rowBgPrimary = "#faf5ef";
-        zebraBg = "#f5ebd9";
-        rowTextColor = "#3c2a21";
-        break;
-      case "synthwave":
-        headerBg = "#241442";
-        subHeaderBg = "#3b1e54";
-        textHeader = "#f472b6";
-        borderCol = "#06b6d4";
-        rowBgPrimary = "#1a0b2e";
-        zebraBg = "#241442";
-        rowTextColor = "#38bdf8";
-        break;
-      case "solarized-dark":
-        headerBg = "#073642";
-        subHeaderBg = "#586e75";
-        textHeader = "#fdf6e3";
-        borderCol = "#2aa198";
-        rowBgPrimary = "#002b36";
-        zebraBg = "#073642";
-        rowTextColor = "#839496";
-        break;
-      case "rose":
-        headerBg = "#881337";
-        subHeaderBg = "#be123c";
-        textHeader = "#ffffff";
-        borderCol = "#f43f5e";
-        rowBgPrimary = "#ffffff";
-        zebraBg = "#fff1f2";
-        rowTextColor = "#4c0519";
-        break;
-      case "emerald":
-        headerBg = "#064e3b";
-        subHeaderBg = "#047857";
-        textHeader = "#ffffff";
-        borderCol = "#10b981";
-        rowBgPrimary = "#ffffff";
-        zebraBg = "#ecfdf5";
-        rowTextColor = "#064e3b";
-        break;
-    }
-
-    return {
-      "--forgejo-header-bg": headerBg,
-      "--forgejo-subheader-bg": subHeaderBg,
-      "--forgejo-text-header": textHeader,
-      "--forgejo-border-col": borderCol,
-      "--forgejo-row-bg": rowBgPrimary,
-      "--forgejo-zebra-bg": zebraBg,
-      "--forgejo-row-text": rowTextColor,
-    };
-  }
-
-  private applyThemeStyles(element: HTMLElement) {
-    element.setCssStyles(this.getThemeCssVars());
-  }
-
   private appendMarkup(container: HTMLElement, markup: string) {
     if (!markup) return;
     const doc = new DOMParser().parseFromString(markup, "text/html");
@@ -589,7 +379,6 @@ export default class ForgejoPlugin extends Plugin {
     }
 
     await this.saveData(settingsToSave);
-    this.app.workspace.containerEl?.setCssStyles(this.getThemeCssVars());
     this.startAutoRefresh();
     this.refreshViews();
   }
@@ -1476,7 +1265,6 @@ export default class ForgejoPlugin extends Plugin {
     let sortAscending = true;
 
     const table = parent.createEl("table", { cls: "forgejo-table" });
-    this.applyThemeStyles(table);
     const thead = table.createEl("thead");
 
     const titleRow = thead.createEl("tr", { cls: "forgejo-title-row" });
@@ -1629,7 +1417,6 @@ export default class ForgejoPlugin extends Plugin {
     rows: [string, string][],
   ) {
     const table = parent.createEl("table", { cls: "forgejo-table" });
-    this.applyThemeStyles(table);
     const thead = table.createEl("thead");
 
     if (this.settings.tableLayout === "vertical") {
@@ -1797,36 +1584,6 @@ class ForgejoSettingTab extends PluginSettingTab {
             this.plugin.settings.tableLayout = value as
               | "vertical"
               | "horizontal";
-            await this.plugin.saveSettings();
-          }),
-      );
-
-    new Setting(containerEl)
-      .setName("Table Theme")
-      .setDesc("Select color theme for rendered tables")
-      .addDropdown((dropdown) =>
-        dropdown
-          .addOption("dark", "Dark Contrast")
-          .addOption("light", "Light Clean")
-          .addOption("blue", "Modern Blue")
-          .addOption("purple", "Purple Accent")
-          .addOption("mono", "Mono")
-          .addOption("sepia", "Sepia")
-          .addOption("nord", "Nord")
-          .addOption("dracula", "Dracula")
-          .addOption("cyberpunk", "Cyberpunk")
-          .addOption("midnight", "Midnight")
-          .addOption("slate", "Slate")
-          .addOption("teal", "Teal")
-          .addOption("amber", "Amber")
-          .addOption("coffee", "Coffee")
-          .addOption("synthwave", "Synthwave")
-          .addOption("solarized-dark", "Solarized Dark")
-          .addOption("rose", "Rose")
-          .addOption("emerald", "Emerald")
-          .setValue(this.plugin.settings.themeStyle)
-          .onChange(async (value) => {
-            this.plugin.settings.themeStyle = value as any;
             await this.plugin.saveSettings();
           }),
       );
