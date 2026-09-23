@@ -8,105 +8,51 @@
     width: 100%;
     border-collapse: collapse;
     margin: 6px 0;
-
-    border: 1px solid $ {
-        borderCol
-    }
-
-    !important;
-
-    background-color: $ {
-        rowBgPrimary
-    }
-
-    !important;
+    border: 1px solid var(--table-border, var(--border-color, #444)) !important;
+    background-color: var(--background-primary) !important;
     font-size: 0.88em;
     border-radius: 4px;
     overflow: hidden;
 }
 
 .forgejo-table th {
-    border: 1px solid $ {
-        borderCol
-    }
-
-    !important;
+    border: 1px solid var(--table-border, var(--border-color, #444)) !important;
     padding: 8px 12px;
     text-align: left;
     vertical-align: middle;
-
-    color: $ {
-        textHeader
-    }
-
-    !important;
+    color: var(--text-normal) !important;
 }
 
 .forgejo-table td {
-    border: 1px solid $ {
-        borderCol
-    }
-
-    !important;
+    border: 1px solid var(--table-border, var(--border-color, #444)) !important;
     padding: 8px 12px;
     text-align: left;
     vertical-align: middle;
-
-    color: $ {
-        rowTextColor
-    }
-
-    !important;
+    color: var(--text-normal) !important;
 }
 
 .forgejo-main-header {
-    background-color: $ {
-        headerBg
-    }
-
-    !important;
+    background-color: var(--background-secondary-alt, var(--background-secondary)) !important;
     font-size: 1.05em;
     font-weight: bold;
     padding: 10px;
     text-align: center !important;
-
-    color: $ {
-        textHeader
-    }
-
-    !important;
+    color: var(--text-normal) !important;
 }
 
 .forgejo-cols-row th {
-    background-color: $ {
-        subHeaderBg
-    }
-
-    !important;
+    background-color: var(--background-secondary) !important;
     font-weight: 600;
-
-    color: $ {
-        textHeader
-    }
-
-    !important;
+    color: var(--text-normal) !important;
     text-align: left;
 }
 
 .forgejo-table tbody tr {
-    background-color: $ {
-        rowBgPrimary
-    }
-
-    !important;
+    background-color: var(--background-primary) !important;
 }
 
 .forgejo-table tbody tr:nth-child(even) {
-    background-color: $ {
-        zebraBg
-    }
-
-    !important;
+    background-color: var(--background-secondary-alt) !important;
 }
 
 .forgejo-fallback-cell {
@@ -189,6 +135,55 @@
     flex-shrink: 0;
 }
 
+.forgejo-sort-icon-muted {
+    opacity: 0.2;
+}
+
+.forgejo-key-cell {
+    font-weight: bold;
+    width: 30%;
+}
+
+.forgejo-settings-info {
+    margin-bottom: 20px;
+    padding: 12px;
+    background-color: var(--background-secondary);
+    border-radius: 6px;
+}
+
+.forgejo-settings-support {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.forgejo-settings-badges {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.forgejo-settings-divider {
+    margin: 20px 0;
+}
+
+.forgejo-test-status {
+    margin-top: 8px;
+}
+
+.forgejo-status-success {
+    color: var(--text-success);
+    font-weight: bold;
+}
+
+.forgejo-status-error {
+    color: var(--text-error);
+    font-weight: bold;
+}
+
 /* Activity Heatmap Styling */
 .forgejo-heatmap-wrap {
     width: 100%;
@@ -216,6 +211,15 @@
     display: flex;
     align-items: center;
     gap: 4px;
+}
+
+/* Duotone SVG Icon styling for heatmap */
+.forgejo-duotone-icon {
+    width: 11px;
+    height: 11px;
+    display: inline-block;
+    vertical-align: middle;
+    flex-shrink: 0;
 }
 
 /* Duotone SVG Icon styling for heatmap */
