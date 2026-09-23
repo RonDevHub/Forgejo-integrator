@@ -3,7 +3,7 @@
   "name": "Forgejo Integrator",
   "version": "1.0.0",
   "minAppVersion": "0.15.0",
-  "description": "A lightweight Obsidian plugin to embed and visualize Forgejo/Gitea/Codeberg Issues and Pull Requests as clean, styled tables directly inside your notes.",
+  "description": "A lightweight plugin to embed and visualize Forgejo/Gitea/Codeberg Issues and Pull Requests as clean, styled tables directly inside your notes.",
   "author": "RonDev",
   "authorUrl": "https://rondev.de",
   "isDesktopOnly": false
