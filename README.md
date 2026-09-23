@@ -32,12 +32,11 @@ Navigate to **Settings > Forgejo Integrator** to configure the plugin:
 
 1. **Forgejo Server URL**: Base URL of your Forgejo instance (e.g., `https://forgejo.yourdomain.com`).
 2. **API Token**: A Personal Access Token with **Read** access to your repositories and user profile.
-3. **Table Theme**: Select a theme (`dark`, `light`, `blue`, `purple`, `mono`, `sepia`, `nord`, `dracula`, `cyberpunk`, `midnight`, `slate`, `teal`, `amber`).
-4. **Table Layout**: Toggle between `vertical` and `horizontal` presentation for single-item blocks.
-5. **Enable Caching**: Toggle local disk/memory caching to minimize network requests.
-6. **Display Language**: Select the output language for tables *(English/German)*
-7. **Refresh Interval**: Set auto-update frequency (Realtime, 1 min, 5 min, 30 min, 1 hr).
-8. **Test Connection**: Click the **Test Connection** button to verify your API credentials.
+3. **Table Layout**: Toggle between `vertical` and `horizontal` presentation for single-item blocks.
+4. **Enable Caching**: Toggle local disk/memory caching to minimize network requests.
+5. **Display Language**: Select the output language for tables *(English/German)*
+6. **Refresh Interval**: Set auto-update frequency (Realtime, 1 min, 5 min, 30 min, 1 hr).
+7. **Test Connection**: Click the **Test Connection** button to verify your API credentials.
 
 ---
 
