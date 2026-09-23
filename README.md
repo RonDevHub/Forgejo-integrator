@@ -1,4 +1,4 @@
-# Obsidian Forgejo Plugin
+# Forgejo Integrator
 
 Seamlessly integrate and render live data from your **Forgejo** (or Gitea) instance directly inside your **Obsidian** notes using custom Markdown code blocks.
 
